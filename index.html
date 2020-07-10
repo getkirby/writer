@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="./demo/Demo.css">
-<link rel="stylesheet" href="./src/Editor.css">
+<link rel="stylesheet" href="./src/Writer.css">
 <style>
 
 .toolbar {
@@ -43,13 +43,13 @@
 <a class="github" href="https://github.com/getkirby/writer"><img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
 
 <script type="module">
-import Editor from "./src/Editor.js";
-const preview = document.querySelector(".preview");
+import Writer from "./src/Writer.js";
 
-let editor = Editor(".k-writer", {
+const preview = document.querySelector(".preview");
+const writer  = Writer(".k-writer", {
     breaks: true,
     onChange() {
-        preview.innerHTML = JSON.stringify(editor.toJson(), null, 4);
+        preview.innerHTML = JSON.stringify(writer.toJson(), null, 4);
     },
     shortcuts: {
         "Meta+k": () => {
@@ -58,7 +58,7 @@ let editor = Editor(".k-writer", {
     }
 });
 
-editor.update();
+writer.update();
 
 /**
  * Toolbar
@@ -69,9 +69,9 @@ const createLink = () => {
     const url = prompt("Please enter a URL");
 
     if (url) {
-        editor.command("link", url);
+        writer.command("link", url);
     } else {
-        editor.command("unlink");
+        writer.command("unlink");
     }
 };
 
@@ -85,7 +85,7 @@ Array.from(buttons).forEach(button => {
         if (command === "link") {
             createLink();
         } else {
-            editor.command(command);
+            writer.command(command);
         }
 
     });
