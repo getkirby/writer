@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="./demo/Demo.css">
+<link rel="stylesheet" href="./src/Editor.css">
+<style>
+
+.toolbar {
+    display: flex;
+    padding: .5rem;
+    border-bottom: 1px solid #ddd;
+}
+.toolbar * + * {
+    margin-left: .5rem;
+}
+.toolbar button {
+    border: 1px solid #ddd;
+    background: none;
+    padding: .25rem .5rem;
+    border-radius: 3px;
+}
+
+</style>
+
+<main class="layout">
+
+    <div>
+        <div class="toolbar">
+            <button data-command="bold">bold</button>
+            <button data-command="italic">italic</button>
+            <button data-command="strikeThrough">del</button>
+            <button data-command="superscript">sup</button>
+            <button data-command="subscript">sub</button>
+            <button data-command="code">code</button>
+            <button data-command="link">link</button>
+            <button data-command="unlink">unlink</button>
+        </div>
+
+        <div class="k-writer" spellcheck="false" contenteditable><p>Lorem <a href="https://getkirby.com">ipsum dolor</a> <strong><i>s</i>it</strong> amet, consetetur sadipscing <i>elitr</i>, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo</p></div>
+    </div>
+
+    <code><pre class="preview"></pre></code>
+
+</main>
+
+<script type="module">
+import Editor from "./src/Editor.js";
+const preview = document.querySelector(".preview");
+
+let editor = Editor(".k-writer", {
+    breaks: true,
+    onChange() {
+        preview.innerHTML = JSON.stringify(editor.toJson(), null, 4);
+    },
+    shortcuts: {
+        "Meta+k": () => {
+            createLink();
+        }
+    }
+});
+
+editor.update();
+
+/**
+ * Toolbar
+ */
+const buttons = document.querySelectorAll(".toolbar button");
+
+const createLink = () => {
+    const url = prompt("Please enter a URL");
+
+    if (url) {
+        editor.command("link", url);
+    } else {
+        editor.command("unlink");
+    }
+};
+
+Array.from(buttons).forEach(button => {
+
+    const command = button.getAttribute("data-command");
+
+    button.addEventListener("click", (event) => {
+        event.preventDefault();
+
+        if (command === "link") {
+            createLink();
+        } else {
+            editor.command(command);
+        }
+
+    });
+
+});
+
+</script>

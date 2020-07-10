@@ -1,0 +1,30 @@
+* {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    padding: 0;
+    margin: 0;
+}
+
+.k-writer {
+    height: 100%;
+    border: 0;
+    padding: .5rem;
+}
+
+.k-writer:focus {
+    outline: none;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+}
+
+.preview {
+    padding: .5rem;
+    white-space: pre-wrap;
+    background: #000;
+    min-height: 100%;
+    color: #fff;
+    font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
+}

@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="./demo/Demo.css">
+<link rel="stylesheet" href="./src/Editor.css">
+
+<main class="layout">
+    <div class="k-writer"><p>Lorem <a href="https://getkirby.com">ipsum dolor</a> <strong><i>s</i>it</strong> amet, consetetur sadipscing <i>elitr</i>, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo</p></div>
+    <code><pre class="preview"></pre></code>
+</main>
+
+<script type="module">
+import Selection from "./src/Selection.js";
+
+const preview = document.querySelector(".preview");
+const selection = Selection(".k-writer");
+
+document.addEventListener("selectionchange", () => {
+
+    const object = {
+        start: selection.start(),
+        end: selection.end(),
+        length: selection.length(),
+        caretPosition: selection.caretPosition()
+    };
+
+    preview.innerHTML = JSON.stringify(object, null, 4);
+
+});
+
+</script>

@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="./demo/Demo.css">
+<link rel="stylesheet" href="./src/Editor.css">
+
+<main class="layout">
+    <div class="k-writer"><p>Lorem <a href="https://getkirby.com">ipsum dolor</a> <strong><i>s</i>it</strong> amet, <code>consetetur</code> sadipscing <i>elitr</i>, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo <div>And another paragraph</div></p></div>
+    <code><pre class="preview"></pre></code>
+</main>
+
+<script type="module">
+
+import Document from "./src/Document.js";
+import Formats from "./src/Formats.js";
+
+const writer = document.querySelector(".k-writer");
+const preview = document.querySelector(".preview");
+const doc = Document(writer, Formats);
+
+writer.innerHTML = doc.toHtml();
+preview.innerHTML = JSON.stringify(doc.toJson(), null, 4);
+
+</script>
