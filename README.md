@@ -1,6 +1,6 @@
 # Kirby Writer
 
-A modern opinionated WYSIWYG editor. 
+A modern opinionated [WYSIWYG editor](https://writer.getkirby.com). 
 
 ## About this editor
 
@@ -23,6 +23,21 @@ This library also does not support any legacy browsers. We don't have to care ab
 ## Demo 
 
 https://writer.getkirby.com
+
+## Usage
+
+```html
+<div class="writer" contenteditable>Hello <b>world</b></div>
+
+<script type="module">
+  import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/src/Writer.js";
+  const editor = Writer(".writer", {
+    onChange() {
+      console.log(editor.toJson());
+    }
+  });
+</script>
+```
 
 ## Contributing
 
