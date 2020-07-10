@@ -4,6 +4,10 @@ A modern opinionated WYSIWYG editor.
 
 ## About this editor
 
+**This library is still experimental and looking for help to get finished. DO NOT USE IN PRODUCTION!** 
+
+----
+
 Yes, you read that correctly. We are trying to build our own contenteditable wrapper in Javascript. It seems like a stupid idea. Maybe it is. But **we are drastically limiting the scope of this project**:
 
 ### Inline formats only
