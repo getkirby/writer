@@ -28,3 +28,9 @@
     color: #fff;
     font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
 }
+
+.github {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
