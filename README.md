@@ -31,7 +31,8 @@ https://writer.getkirby.com
 
 <script type="module">
   import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/src/Writer.js";
-  const editor = Writer(".writer", {
+  
+  const writer = Writer(".writer", {
     onChange() {
       console.log(editor.toJson());
     }
