@@ -1,0 +1,27 @@
+{
+  "name": "kirby-writer",
+  "version": "0.0.1",
+  "description": "Kirby writer is a modern opinionated WYSIWYG editor.",
+  "main": "index.html",
+  "scripts": {
+    "dev": "php -S localhost:8181"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getkirby/writer.git"
+  },
+  "keywords": [
+    "js",
+    "wysiwyg",
+    "editor",
+    "kirby",
+    "cms",
+    "content"
+  ],
+  "author": "Bastian Allgeier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/getkirby/writer/issues"
+  },
+  "homepage": "https://github.com/getkirby/writer#readme"
+}
