@@ -5,6 +5,32 @@ export default (element, formats = {}) => {
 
   let doc = Parser(element, formats);
 
+  const activeFormats = (start, end) => {
+    start = startAt(start);
+    end = startAt(end);
+
+    let formats = [];
+
+    for (let x = start; x < end; x++) {
+      const character = doc[x];
+      if (character) {
+        Object.keys(character.format).forEach(formatName => {
+          if (formats.includes(formatName) === false) {
+            /**
+            * check if this format applies to all
+            * characters in the selection
+            */
+            if (hasFormat(formatName, start, end)) {
+              formats.push(formatName);
+            }
+          }
+        });
+      };
+    }
+
+    return formats;
+  };
+
   const addFormat = (format, attributes, start, end) => {
     start = startAt(start);
     end   = endAt(end);
@@ -54,10 +80,10 @@ export default (element, formats = {}) => {
     const elementFormats = Object.keys(element.format || {});
 
     /**
-     * Make sure that HTML entities
-     * in strings don't cause any unexpected
-     * issues and unwanted XSS injections
-     */
+    * Make sure that HTML entities
+    * in strings don't cause any unexpected
+    * issues and unwanted XSS injections
+    */
     let p = document.createElement("p");
     p.textContent = element.text;
 
@@ -187,6 +213,7 @@ export default (element, formats = {}) => {
   };
 
   return {
+    activeFormats,
     addFormat,
     addFormatAt,
     append,
