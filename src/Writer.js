@@ -1,6 +1,7 @@
+import Cursor from "./Cursor.js";
+import DefaultFormats from "./Formats.js";
 import Document from "./Document.js";
 import Selection from "./Selection.js";
-import defaultFormats from "./Formats.js";
 import Parser from "./Parser.js";
 
 export default (element, params) => {
@@ -30,9 +31,10 @@ export default (element, params) => {
   };
 
   const options = { ...defaults, ...params };
-  const formats = { ...defaultFormats, ...options.formats };
+  const formats = { ...DefaultFormats, ...options.formats };
   const doc = Document(element, formats);
   const selection = Selection(element);
+  const cursor = Cursor(element, selection);
 
   element.setAttribute("contenteditable", true);
   element.setAttribute("spellcheck", options.spellcheck);
@@ -77,10 +79,10 @@ export default (element, params) => {
         return false;
       }
 
-      const caretPosition = selection.caretPosition();
-      doc.insertTextAt("\n", caretPosition);
+      const cursorPosition = cursor.position();
+      doc.insertTextAt("\n", cursorPosition);
       update();
-      select(caretPosition + 1);
+      select(cursorPosition + 1);
     },
     insert(text, at) {
       doc.insertTextAt(text, at);
@@ -99,7 +101,7 @@ export default (element, params) => {
       select(start, end);
     },
     paste(html) {
-      let caretPosition = selection.caretPosition();
+      let cursorPosition = cursor.position();
       let container = document.createElement("div");
       container.innerHTML = html;
 
@@ -107,7 +109,7 @@ export default (element, params) => {
 
       doc.append(parsed);
       update();
-      select(caretPosition);
+      select(cursorPosition);
     },
     strikeThrough() {
       format("strikeThrough");
@@ -339,7 +341,7 @@ export default (element, params) => {
     element.addEventListener("input", (event) => {
       switch (event.inputType) {
         case "insertText":
-        command("insert", event.data, selection.caretPosition() - 1);
+        command("insert", event.data, cursor.position() - 1);
         break;
       }
     });
@@ -356,7 +358,9 @@ export default (element, params) => {
       activeFormats,
       activeLink,
       command,
+      cursor,
       doc,
+      element,
       options,
       select,
       selection,

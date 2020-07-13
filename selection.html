@@ -24,7 +24,6 @@ document.addEventListener("selectionchange", () => {
     start: selection.start(),
     end: selection.end(),
     length: selection.length(),
-    caretPosition: selection.caretPosition()
   };
 
   preview.innerHTML = JSON.stringify(object, null, 4);

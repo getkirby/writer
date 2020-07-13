@@ -10,11 +10,14 @@ export default (container) => {
     ancestor() {
       return this.range().commonAncestorContainer;
     },
-    caretPosition() {
-      return this.start();
+    containerRect() {
+      let range = document.createRange();
+      range.selectNodeContents(container);
+      const rect = range.getBoundingClientRect();
+      return rect;
     },
     start() {
-      return this.rangeBeforeCaret().toString().length;
+      return this.rangeBeforeCursor().toString().length;
     },
     end() {
       return this.start() + this.length();
@@ -36,14 +39,14 @@ export default (container) => {
     range() {
       return this.object().getRangeAt(0);
     },
-    rangeAfterCaret() {
+    rangeAfterCursor() {
       const range = this.range();
       const copy = range.cloneRange();
       copy.selectNodeContents(container);
       copy.setStart(range.endContainer, range.endOffset);
       return copy;
     },
-    rangeBeforeCaret() {
+    rangeBeforeCursor() {
       const range = this.range();
       const copy = range.cloneRange();
       copy.selectNodeContents(container);
@@ -51,8 +54,7 @@ export default (container) => {
       return copy;
     },
     rect() {
-      return ContentSelect.Range.rect();
-
+      return this.range().getBoundingClientRect();
     },
     select(start, end) {
       end = end || start;
