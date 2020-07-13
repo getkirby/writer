@@ -45,7 +45,7 @@
       <button data-command="link"><u>Link</u></button>
     </div>
 
-    <div class="k-writer" spellcheck="false" contenteditable><p>Lorem <a href="https://getkirby.com">ipsum dolor</a> <strong><i>s</i>it</strong> amet, consetetur sadipscing <i>elitr</i>, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo</p></div>
+    <div class="k-writer"><p>Lorem <a href="https://getkirby.com">ipsum dolor</a> <strong><i>s</i>it</strong> amet, consetetur sadipscing <i>elitr</i>, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo</p></div>
   </div>
 
   <code><pre class="preview"></pre></code>
@@ -121,7 +121,8 @@ const writer  = Writer(".k-writer", {
     "Meta+k": () => {
       createLink();
     }
-  }
+  },
+  spellcheck: false
 });
 
 /**

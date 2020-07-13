@@ -25,13 +25,17 @@ export default (element, params) => {
     onSelection: () => {},
     onSelectionEnd: () => {},
     onSelectionStart: () => {},
-    shortcuts: {}
+    shortcuts: {},
+    spellcheck: true
   };
 
   const options = { ...defaults, ...params };
   const formats = { ...defaultFormats, ...options.formats };
   const doc = Document(element, formats);
   const selection = Selection(element);
+
+  element.setAttribute("contenteditable", true);
+  element.setAttribute("spellcheck", options.spellcheck);
 
   /**
    * All available editor commands
