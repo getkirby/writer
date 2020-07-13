@@ -64,13 +64,23 @@ const preview = document.querySelector(".preview");
  * Creates a new link
  */
 const createLink = () => {
-  const url = prompt("Please enter a URL");
+  let href = null;
+  let link = writer.activeLink();
+
+  if (link) {
+    href = link.href;
+  }
+
+  const url = prompt("Please enter a URL", href || "");
 
   if (url) {
     writer.command("link", url);
-  } else {
+  } else if (url !== null) {
     writer.command("unlink");
   }
+
+  toolbar.hide();
+
 };
 
 /**

@@ -134,6 +134,16 @@ export default (element, params) => {
   };
 
   /**
+   * Get the last link and all its attributes
+   * in the document selection
+   */
+  const activeLink = () => {
+    const start = selection.start();
+    const end = selection.end();
+    return doc.activeLink(start, end);
+  };
+
+  /**
    * Apply one of the registered commands
    */
   const command = (command, ...args) => {
@@ -340,6 +350,7 @@ export default (element, params) => {
     */
     return {
       activeFormats,
+      activeLink,
       command,
       doc,
       options,

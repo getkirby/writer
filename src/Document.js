@@ -1,5 +1,4 @@
 import Parser from "./Parser.js";
-import Formats from "./Formats.js";
 
 export default (element, formats = {}) => {
 
@@ -31,6 +30,23 @@ export default (element, formats = {}) => {
     return formats;
   };
 
+  const activeLink = (start, end) => {
+    start = startAt(start);
+    end = startAt(end);
+
+    let link = false;
+
+    get(start, end).forEach(char => {
+      Object.keys(char.format).forEach(formatName => {
+        if (formatName === "link") {
+          link = char.format.link;
+        }
+      });
+    });
+
+    return link;
+  };
+
   const addFormat = (format, attributes, start, end) => {
     start = startAt(start);
     end   = endAt(end);
@@ -56,6 +72,20 @@ export default (element, formats = {}) => {
     }
 
     return end;
+  };
+
+  const get = (start, end) => {
+    start = startAt(start);
+    end = endAt(end);
+    let result = [];
+
+    for (let x = start; x < end; x++) {
+      if (doc[x]) {
+        result.push(doc[x]);
+      }
+    }
+
+    return result;
   };
 
   const hasFormat = (format, start, end) => {
@@ -214,10 +244,12 @@ export default (element, formats = {}) => {
 
   return {
     activeFormats,
+    activeLink,
     addFormat,
     addFormatAt,
     append,
     doc,
+    get,
     hasFormat,
     hasFormatAt,
     insertTextAt,
