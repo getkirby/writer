@@ -1,23 +1,23 @@
 .k-writer {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    white-space: pre-wrap;
-    line-height: 1.5em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  white-space: pre-wrap;
+  line-height: 1.5em;
 }
 .k-writer code {
-    font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
-    background: #efefef;
-    font-size: .925rem;
-    padding: 0 .125em;
-    display: inline-block;
-    border-radius: 3px;
+  font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
+  background: #efefef;
+  font-size: .925rem;
+  padding: 0 .125em;
+  display: inline-block;
+  border-radius: 3px;
 }
 .k-writer strong {
-    font-weight: bold;
+  font-weight: bold;
 }
 .k-writer em {
-    font-style: italic;
+  font-style: italic;
 }
 .k-writer a {
-    text-decoration: underline;
-    color: currentColor;
+  text-decoration: underline;
+  color: currentColor;
 }
