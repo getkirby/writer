@@ -55,89 +55,72 @@
 <a class="github" href="https://github.com/getkirby/writer"><img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
 
 <script type="module">
-  import Writer from "./src/Writer.js";
+import Toolbar from "./src/Toolbar.js";
+import Writer from "./src/Writer.js";
 
-  const preview = document.querySelector(".preview");
-  const toolbar = document.querySelector(".toolbar");
-  const buttons = document.querySelectorAll(".toolbar button");
+const preview = document.querySelector(".preview");
 
-  const writer  = Writer(".k-writer", {
-    breaks: true,
-    onChange() {
-      preview.innerHTML = JSON.stringify(writer.toJson(), null, 4);
-    },
-    onMousedown() {
-      toolbar.style.display = "none";
-    },
-    onSelection() {
-      const activeFormats = writer.activeFormats();
+/**
+ * Creates a new link
+ */
+const createLink = () => {
+  const url = prompt("Please enter a URL");
 
-      buttons.forEach(button => {
-        const command = button.getAttribute("data-command");
+  if (url) {
+    writer.command("link", url);
+  } else {
+    writer.command("unlink");
+  }
+};
 
-        if (activeFormats.includes(command)) {
-          button.classList.add("active");
-        } else {
-          button.classList.remove("active");
-        }
-      });
+/**
+ * Toolbar
+ */
+const toolbar = Toolbar(".toolbar", (command) => {
+  if (command === "link") {
+    createLink();
+  } else {
+    writer.command(command);
+  }
+});
 
-    },
-    onSelectionEnd() {
-      const rect = writer.selection.rect();
+/**
+ * Writer instance
+ */
+const writer  = Writer(".k-writer", {
+  breaks: true,
+  onChange() {
+    preview.innerHTML = JSON.stringify(writer.toJson(), null, 4);
+  },
+  onMousedown() {
+    toolbar.hide();
+  },
+  onSelection() {
+    toolbar.activeFormats(writer.activeFormats());
+  },
+  onSelectionEnd() {
+    const rect = writer.selection.rect();
 
-      if (writer.selection.length() > 0) {
-        toolbar.style.display = "flex";
-
-        const height = toolbar.offsetHeight;
-        const width  = toolbar.offsetWidth;
-
-        const top  = Math.round(rect.top - height - 4);
-        const left = Math.round( ((rect.left + rect.right) / 2) - (width / 2) );
-
-        toolbar.style.top  = top < 0 ? 0 : top;
-        toolbar.style.left = left < 0 ? 0 : left;
-
-      } else {
-        toolbar.style.display = "none";
-      }
-    },
-    shortcuts: {
-      "Meta+k": () => {
-        createLink();
-      }
-    }
-  });
-
-  writer.update();
-
-  /**
-  * Toolbar
-  */
-  const createLink = () => {
-    const url = prompt("Please enter a URL");
-
-    if (url) {
-      writer.command("link", url);
+    if (writer.selection.length() > 0) {
+      toolbar.show(rect);
     } else {
-      writer.command("unlink");
+      toolbar.hide();
     }
-  };
+  },
+  shortcuts: {
+    "Meta+k": () => {
+      createLink();
+    }
+  }
+});
 
-  Array.from(buttons).forEach(button => {
-
-    const command = button.getAttribute("data-command");
-
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-
-      if (command === "link") {
-        createLink();
-      } else {
-        writer.command(command);
-      }
-    });
-
-  });
+/**
+ * Update the preview with the right
+ * document state after the writer gets
+ * initialized. This is only necessary
+ * for this demo or if you want to trigger
+ * the onChange event immediately.
+ */
+writer.update();
 
 </script>
