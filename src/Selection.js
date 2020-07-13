@@ -11,7 +11,7 @@ export default (container) => {
       return this.range().commonAncestorContainer;
     },
     caretPosition() {
-      return this.start() - 1;
+      return this.start();
     },
     start() {
       return this.rangeBeforeCaret().toString().length;

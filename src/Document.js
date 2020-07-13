@@ -66,6 +66,10 @@ export default (element, formats = {}) => {
     doc = doc.concat(content);
   };
 
+  const clone = () => {
+    return JSON.parse(JSON.stringify(doc));
+  };
+
   const endAt = (end) => {
     if (end === undefined || end === false) {
       return doc.length - 1;
@@ -193,10 +197,13 @@ export default (element, formats = {}) => {
     }
   };
 
-  const toHtml = () => {
+  const toHtml = (start, end) => {
+    start = startAt(start);
+    end = endAt(end);
+
     let html = [];
 
-    toJson().forEach(curr => {
+    toJson(start, end).forEach(curr => {
       html.push(htmlElement(curr));
     });
 
@@ -209,18 +216,23 @@ export default (element, formats = {}) => {
     return html;
   };
 
-  const toJson = () => {
+  const toJson = (start, end) => {
+    start = startAt(start);
+    end = endAt(end);
+
+    const d = clone().slice(start, end);
+
     let json = [];
     let step = -1;
 
-    doc.forEach((curr, index) => {
+    d.forEach((curr, index) => {
 
-      const prev = doc[index - 1] || {};
+      const prev = d[index - 1] || {};
 
       const prevId = JSON.stringify({ format: prev.format });
       const currId = JSON.stringify({ format: curr.format });
 
-      if (!doc[index - 1] || prevId !== currId) {
+      if (!d[index - 1] || prevId !== currId) {
         json.push({...curr});
         step++;
       } else if (json[step]) {
@@ -232,10 +244,10 @@ export default (element, formats = {}) => {
     return json;
   };
 
-  const toText = () => {
+  const toText = (start, end) => {
     let text = "";
 
-    doc.forEach(curr => {
+    clone().slice(start, end).forEach(curr => {
       text += curr.text;
     });
 

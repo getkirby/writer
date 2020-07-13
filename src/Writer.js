@@ -74,9 +74,9 @@ export default (element, params) => {
       }
 
       const caretPosition = selection.caretPosition();
-      doc.insertTextAt("\n", caretPosition + 1);
+      doc.insertTextAt("\n", caretPosition);
       update();
-      select(caretPosition + 2);
+      select(caretPosition + 1);
     },
     insert(text, at) {
       doc.insertTextAt(text, at);
@@ -103,7 +103,7 @@ export default (element, params) => {
 
       doc.append(parsed);
       update();
-      select(caretPosition + 1);
+      select(caretPosition);
     },
     strikeThrough() {
       format("strikeThrough");
@@ -335,7 +335,7 @@ export default (element, params) => {
     element.addEventListener("input", (event) => {
       switch (event.inputType) {
         case "insertText":
-        command("insert", event.data, selection.caretPosition());
+        command("insert", event.data, selection.caretPosition() - 1);
         break;
       }
     });
@@ -356,14 +356,14 @@ export default (element, params) => {
       options,
       select,
       selection,
-      toHtml() {
-        return doc.toHtml();
+      toHtml(start, end) {
+        return doc.toHtml(start, end);
       },
-      toJson() {
-        return doc.toJson();
+      toJson(start, end) {
+        return doc.toJson(start, end);
       },
-      toText() {
-        return doc.toText();
+      toText(start, end) {
+        return doc.toText(start, end);
       },
       update
     };
