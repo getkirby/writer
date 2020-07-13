@@ -6,8 +6,8 @@ custom Selection API wrapper
 <link rel="stylesheet" href="./src/Writer.css">
 
 <main class="layout">
-    <div class="k-writer"><p>Lorem <a href="https://getkirby.com">ipsum dolor</a> <strong><i>s</i>it</strong> amet, consetetur sadipscing <i>elitr</i>, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo</p></div>
-    <code><pre class="preview"></pre></code>
+  <div class="k-writer"><p>Lorem <a href="https://getkirby.com">ipsum dolor</a> <strong><i>s</i>it</strong> amet, consetetur sadipscing <i>elitr</i>, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo</p></div>
+  <code><pre class="preview"></pre></code>
 </main>
 
 <a class="github" href="https://github.com/getkirby/writer"><img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
@@ -20,14 +20,14 @@ const selection = Selection(".k-writer");
 
 document.addEventListener("selectionchange", () => {
 
-    const object = {
-        start: selection.start(),
-        end: selection.end(),
-        length: selection.length(),
-        caretPosition: selection.caretPosition()
-    };
+  const object = {
+    start: selection.start(),
+    end: selection.end(),
+    length: selection.length(),
+    caretPosition: selection.caretPosition()
+  };
 
-    preview.innerHTML = JSON.stringify(object, null, 4);
+  preview.innerHTML = JSON.stringify(object, null, 4);
 
 });
 
