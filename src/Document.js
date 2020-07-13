@@ -1,3 +1,4 @@
+import Clone from "./Clone.js";
 import Parser from "./Parser.js";
 
 export default (element, formats = {}) => {
@@ -67,7 +68,7 @@ export default (element, formats = {}) => {
   };
 
   const clone = () => {
-    return JSON.parse(JSON.stringify(doc));
+    return Clone(doc);
   };
 
   const endAt = (end) => {
@@ -260,6 +261,7 @@ export default (element, formats = {}) => {
     addFormat,
     addFormatAt,
     append,
+    clone,
     doc,
     get,
     hasFormat,

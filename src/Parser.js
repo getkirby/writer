@@ -1,3 +1,5 @@
+import clone from "./Clone.js";
+
 export default (node, formats = {}) => {
 
   if (typeof node === "string") {
@@ -127,6 +129,6 @@ export default (node, formats = {}) => {
   * reference issues later. I guess it has something
   * to do with merging arrays
   */
-  return JSON.parse(JSON.stringify(charsInNode(node)));
+  return clone(charsInNode(node));
 
 };
