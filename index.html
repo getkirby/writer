@@ -94,13 +94,17 @@ const toolbar = Toolbar(".toolbar", (command) => {
   }
 });
 
+const updatePreview = () => {
+  preview.innerHTML = JSON.stringify(writer.toJson(), null, 4);
+};
+
 /**
  * Writer instance
  */
 const writer  = Writer(".k-writer", {
   breaks: true,
   onChange() {
-    preview.innerHTML = JSON.stringify(writer.toJson(), null, 4);
+    updatePreview();
   },
   onMousedown() {
     toolbar.hide();
@@ -140,8 +144,7 @@ const writer  = Writer(".k-writer", {
  * for this demo or if you want to trigger
  * the onChange event immediately.
  */
-writer.update();
-
+updatePreview();
 
 
 
