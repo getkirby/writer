@@ -339,10 +339,11 @@ export default (element, params) => {
     * event.
     */
     element.addEventListener("input", (event) => {
+
       switch (event.inputType) {
         case "insertText":
-        command("insert", event.data, cursor.position() - 1);
-        break;
+          command("insert", event.data, cursor.position() - 1);
+          break;
       }
     });
 
