@@ -61,10 +61,12 @@ export default (element, formats = {}) => {
     if (doc[index]) {
       doc[index].format[format] = attributes || true;
     }
+
+    replace(doc);
   };
 
   const append = (content) => {
-    doc = doc.concat(content);
+    replace(doc.concat(content));
   };
 
   const clone = () => {
@@ -144,6 +146,8 @@ export default (element, formats = {}) => {
       text: text,
       format: format
     });
+
+    replace(doc);
   };
 
   const removeFormat = (format, start, end) => {
@@ -157,6 +161,8 @@ export default (element, formats = {}) => {
 
   const removeFormatAt = (format, index) => {
     delete doc[index].format[format];
+
+    replace(doc);
   };
 
   const removeFormats = (start, end) => {
@@ -166,6 +172,8 @@ export default (element, formats = {}) => {
     for (let x = start; x < end; x++) {
       doc[x].format = {};
     }
+
+    replace(doc);
   };
 
   const removeTextAt = (at, length) => {
@@ -173,6 +181,11 @@ export default (element, formats = {}) => {
     length = (!length || length < 1) ? 1 : length;
 
     doc.splice(at, length);
+    replace(doc);
+  };
+
+  const replace = (newDocument) => {
+    doc = Clone(newDocument);
   };
 
   const startAt = (start) => {
@@ -271,6 +284,7 @@ export default (element, formats = {}) => {
     removeFormatAt,
     removeFormats,
     removeTextAt,
+    replace,
     toggleFormat,
     toggleFormatAt,
     toHtml,
