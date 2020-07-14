@@ -122,14 +122,6 @@ const writer  = Writer(".k-writer", {
     }
   },
   shortcuts: {
-    "ArrowDown": () => {
-      console.log("Last line: " + writer.cursor.isInLastLine());
-      return true;
-    },
-    "ArrowUp": () => {
-      console.log("First line: " + writer.cursor.isInFirstLine());
-      return true;
-    },
     "Meta+k": () => {
       createLink();
     }

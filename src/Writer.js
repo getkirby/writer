@@ -1,6 +1,7 @@
 import Cursor from "./Cursor.js";
 import DefaultFormats from "./Formats.js";
 import Document from "./Document.js";
+import History from "./History.js";
 import Selection from "./Selection.js";
 import Parser from "./Parser.js";
 
@@ -16,6 +17,7 @@ export default (element, params) => {
   const defaults = {
     breaks: true,
     formats: {},
+    history: 100,
     onBlur: () => {},
     onChange: () => {},
     onFocus: () => {},
@@ -23,18 +25,42 @@ export default (element, params) => {
     onKeyup: () => {},
     onMousedown: () => {},
     onMouseup: () => {},
+    onRedo: () => {},
     onSelection: () => {},
     onSelectionEnd: () => {},
     onSelectionStart: () => {},
+    onUndo: () => {},
     shortcuts: {},
     spellcheck: true
   };
 
   const options = { ...defaults, ...params };
   const formats = { ...DefaultFormats, ...options.formats };
-  const doc = Document(element, formats);
+
+  const onHistory = (doc, action, args) => {
+    update();
+    if (args && (args.start || args.end)) {
+      selection.select(args.start, args.end);
+    }
+  };
+
+  const doc = Document(element, {
+    formats: formats,
+    history: options.history,
+    onRedo: (doc, action, args) => {
+      onHistory(doc, action, args);
+      options.onRedo(doc, action, args);
+    },
+    onUndo: (doc, action, args) => {
+      onHistory(doc, action, args);
+      options.onUndo(doc, action, args);
+    }
+  });
+
   const selection = Selection(element);
   const cursor = Cursor(element, selection);
+
+  let isSelecting = false;
 
   element.setAttribute("contenteditable", true);
   element.setAttribute("spellcheck", options.spellcheck);
@@ -58,7 +84,7 @@ export default (element, params) => {
         length = 1;
       }
 
-      doc.removeTextAt(start, length);
+      doc.removeText(start, length);
       update(start);
       select(start);
     },
@@ -70,7 +96,7 @@ export default (element, params) => {
         length = 1;
       }
 
-      doc.removeTextAt(start, length);
+      doc.removeText(start, length);
       update(start);
       select(start);
     },
@@ -80,12 +106,12 @@ export default (element, params) => {
       }
 
       const cursorPosition = cursor.position();
-      doc.insertTextAt("\n", cursorPosition);
+      doc.insertText("\n", cursorPosition);
       update();
       select(cursorPosition + 1);
     },
     insert(text, at) {
-      doc.insertTextAt(text, at);
+      doc.insertText(text, at);
       update();
       select(at + text.length);
     },
@@ -173,12 +199,40 @@ export default (element, params) => {
     select(start, end);
   };
 
+  const onSelectionEnd = () => {
+    if (isSelecting === true) {
+      isSelecting = false;
+      options.onSelectionEnd(event);
+    }
+  };
+
+  const onSelectionStart = () => {
+    if (isSelecting === false) {
+      isSelecting = true;
+      options.onSelectionStart(event);
+    }
+  };
+
+  /**
+   * Redo the last step in history
+   */
+  const redo = () => {
+    doc.redo();
+  };
+
   /**
    * Select text in the editor
    */
   const select = (start, end) => {
     isSelecting = true;
     selection.select(start, end);
+  };
+
+  /**
+   * Undo the last step in history
+   */
+  const undo = () => {
+    doc.undo();
   };
 
   /**
@@ -198,8 +252,6 @@ export default (element, params) => {
   element.addEventListener("focus", options.onFocus);
   element.addEventListener("mousedown", options.onMousedown);
 
-  let isSelecting = false;
-
   /**
    * Use the document selectionchange event
    * to detect and trigger selection changes
@@ -207,13 +259,10 @@ export default (element, params) => {
    */
   document.addEventListener("selectionchange", (event) => {
     if (selection.isWithin()) {
-      if (isSelecting === false) {
-        options.onSelectionStart(event);
-      }
-      isSelecting = true;
+      onSelectionStart();
       options.onSelection(event);
     } else {
-      isSelecting = false;
+      onSelectionEnd(event);
     }
   });
 
@@ -222,10 +271,7 @@ export default (element, params) => {
   */
   element.addEventListener("mouseup", (event) => {
     options.onMouseup(event);
-    if (isSelecting === true) {
-      isSelecting = false;
-      options.onSelectionEnd(event);
-    }
+    onSelectionEnd(event);
   });
 
   /**
@@ -233,10 +279,7 @@ export default (element, params) => {
   */
   element.addEventListener("keyup", (event) => {
     options.onKeyup(event);
-    if (isSelecting === true) {
-      isSelecting = false;
-      options.onSelectionEnd(event);
-    }
+    onSelectionEnd(event);
   });
 
   /**
@@ -300,6 +343,21 @@ export default (element, params) => {
     pressed = pressed.join("+");
 
     /**
+     * History
+     */
+    if (pressed === "Meta+z") {
+      event.preventDefault();
+      undo();
+      return;
+    }
+
+    if (pressed === "Meta+Shift+z") {
+      event.preventDefault();
+      redo();
+      return;
+    }
+
+    /**
     * Delete selected text before
     * new text is entered, but
     * only if this is not a special key
@@ -317,63 +375,70 @@ export default (element, params) => {
       // the added character should only be one character long
       // this will filter out arrow keys and other special commands
       event.key.length === 1
-      ) {
-        command("delete");
-      }
-
-      /**
-      * Find and apply keyboard shortcuts
-      */
-      if (shortcuts[pressed]) {
-        const result = command(shortcuts[pressed]);
-
-        if (!result) {
-          event.preventDefault();
-        }
-      }
-    });
+    ) {
+      command("delete");
+    }
 
     /**
-    * It's easier to recognize text input
-    * in the input event instead of the keydown
-    * event.
-    */
-    element.addEventListener("input", (event) => {
+     * Find and apply keyboard shortcuts
+     */
+    if (shortcuts[pressed]) {
+      const result = command(shortcuts[pressed]);
 
-      switch (event.inputType) {
-        case "insertText":
-          command("insert", event.data, cursor.position() - 1);
-          break;
+      if (!result) {
+        event.preventDefault();
       }
-    });
+    }
+  });
 
-    /**
-    * make sure the element has the correct HTML
-    */
-    element.innerHTML = doc.toHtml();
+  /**
+   * It's easier to recognize text input
+   * in the input event instead of the keydown
+   * event.
+   */
+  element.addEventListener("input", (event) => {
+    switch (event.inputType) {
+      case "historyRedo":
+        redo();
+        break;
+      case "historyUndo":
+        undo();
+        break;
+      case "insertText":
+        command("insert", event.data, cursor.position() - 1);
+        break;
+    }
+  });
 
-    /**
-    * Public commands and properties
-    */
-    return {
-      activeFormats,
-      activeLink,
-      command,
-      cursor,
-      doc,
-      element,
-      options,
-      select,
-      selection,
-      toHtml(start, end) {
-        return doc.toHtml(start, end);
-      },
-      toJson(start, end) {
-        return doc.toJson(start, end);
-      },
-      toText(start, end) {
-        return doc.toText(start, end);
-      },
-      update
-    };
+  /**
+   * make sure the element has the correct HTML
+   */
+  element.innerHTML = doc.toHtml();
+
+  /**
+   * Public commands and properties
+   */
+  return {
+    activeFormats,
+    activeLink,
+    command,
+    cursor,
+    doc,
+    element,
+    options,
+    redo,
+    select,
+    selection,
+    toHtml(start, end) {
+      return doc.toHtml(start, end);
+    },
+    toJson(start, end) {
+      return doc.toJson(start, end);
+    },
+    toText(start, end) {
+      return doc.toText(start, end);
+    },
+    undo,
+    update
   };
+};

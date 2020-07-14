@@ -98,6 +98,6 @@ export default (container) => {
     text() {
       const range = this.range();
       return range ? range.toString() : "";
-    }
+    },
   };
 };

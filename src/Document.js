@@ -1,9 +1,21 @@
 import Clone from "./Clone.js";
+import History from "./History.js";
 import Parser from "./Parser.js";
 
-export default (element, formats = {}) => {
+export default (element, params = {}) => {
 
-  let doc = Parser(element, formats);
+  const defaults = {
+    formats: {},
+    history: 100,
+    onCommit: () => {},
+    onRedo: () => {},
+    onUndo: () => {}
+  };
+
+  const options = { ...defaults, ...params };
+  const history = History(options.history);
+
+  let doc = Parser(element, options.formats);
 
   const activeFormats = (start, end) => {
     start = startAt(start);
@@ -53,24 +65,32 @@ export default (element, formats = {}) => {
     end   = endAt(end);
 
     for (let x = start; x < end; x++) {
-      addFormatAt(format, attributes, x);
-    }
-  };
-
-  const addFormatAt = (format, attributes, index) => {
-    if (doc[index]) {
-      doc[index].format[format] = attributes || true;
+      if (doc[x]) {
+        doc[x].format[format] = attributes || true;
+      }
     }
 
-    replace(doc);
+    commit(doc, "addFormat", {
+      format,
+      attributes,
+      start,
+      end
+    })
   };
 
   const append = (content) => {
-    replace(doc.concat(content));
+    doc.concat(content);
+    commit(doc, "append", { content });
   };
 
   const clone = () => {
     return Clone(doc);
+  };
+
+  const commit = (doc, action, args) => {
+    remember(doc, action, args);
+    options.onCommit(doc, action, args);
+    replace(doc);
   };
 
   const endAt = (end) => {
@@ -100,16 +120,12 @@ export default (element, formats = {}) => {
     end = endAt(end);
 
     for (let x = start; x < end; x++) {
-      if (hasFormatAt(format, x) === false) {
+      if (doc[x].format[format] != undefined === false) {
         return false;
       }
     }
 
     return true;
-  };
-
-  const hasFormatAt = (format, index) => {
-    return doc[index].format[format] != undefined;
   };
 
   const htmlElement = (element) => {
@@ -131,23 +147,43 @@ export default (element, formats = {}) => {
     }
 
     elementFormats.forEach(formatName => {
-      html = formats[formatName].html(html, element.format[formatName]);
+      html = options.formats[formatName].html(html, element.format[formatName]);
     });
 
     return html;
   };
 
-  const insertTextAt = (text, at) => {
-    at = endAt(at);
+  const insertText = (text, start) => {
+    start = endAt(start);
 
-    const format = doc[at] ? doc[at].format : {};
+    const format = doc[start] ? doc[start].format : {};
 
-    doc.splice(at, 0, {
+    doc.splice(start, 0, {
       text: text,
       format: format
     });
 
-    replace(doc);
+    commit(doc, "insertText", { text, start: start + 1 });
+  };
+
+  const recall = (action, callback) => {
+    const memory = history[action]();
+    if (memory) {
+      doc = Clone(memory.doc);
+      callback(memory.doc, memory.action, memory.args);
+    }
+  };
+
+  const redo = () => {
+    recall("redo", options.onRedo);
+  };
+
+  const remember = (doc, action, args) => {
+    history.push({
+      doc: Clone(doc),
+      action: action,
+      args: args
+    });
   };
 
   const removeFormat = (format, start, end) => {
@@ -155,14 +191,10 @@ export default (element, formats = {}) => {
     end   = endAt(end);
 
     for (let x = start; x < end; x++) {
-      removeFormatAt(format, x);
+      delete doc[x].format[format];
     }
-  };
 
-  const removeFormatAt = (format, index) => {
-    delete doc[index].format[format];
-
-    replace(doc);
+    commit(doc, "removeFormat", { format, start, end });
   };
 
   const removeFormats = (start, end) => {
@@ -173,19 +205,21 @@ export default (element, formats = {}) => {
       doc[x].format = {};
     }
 
-    replace(doc);
+    commit(doc, "removeFormats", { start, end });
   };
 
-  const removeTextAt = (at, length) => {
-    at = at !== undefined ? at : doc.length - 1;
+  const removeText = (start, length) => {
+    start  = endAt(start);
     length = (!length || length < 1) ? 1 : length;
 
-    doc.splice(at, length);
-    replace(doc);
+    doc.splice(start, length);
+
+    commit(doc, "removeText", { start, length });
   };
 
-  const replace = (newDocument) => {
-    doc = Clone(newDocument);
+  const replace = (newDoc) => {
+    doc = Clone(newDoc);
+    return doc;
   };
 
   const startAt = (start) => {
@@ -200,14 +234,6 @@ export default (element, formats = {}) => {
       removeFormat(format, start, end);
     } else {
       addFormat(format, attributes, start, end);
-    }
-  };
-
-  const toggleFormatAt = (format, attributes, index) => {
-    if (hasFormatAt(format, index)) {
-      removeFormatAt(format, index);
-    } else {
-      addFormatAt(format, attributes, index);
     }
   };
 
@@ -268,28 +294,36 @@ export default (element, formats = {}) => {
     return text;
   };
 
+  const undo = () => {
+    recall("undo", options.onUndo);
+  };
+
+  /**
+   * Keep the initial state of the document
+   * in history
+   */
+  remember(doc, "init", {});
+
   return {
     activeFormats,
     activeLink,
     addFormat,
-    addFormatAt,
     append,
     clone,
     doc,
     get,
     hasFormat,
-    hasFormatAt,
-    insertTextAt,
+    insertText,
+    redo,
     removeFormat,
-    removeFormatAt,
     removeFormats,
-    removeTextAt,
+    removeText,
     replace,
     toggleFormat,
-    toggleFormatAt,
     toHtml,
     toJson,
-    toText
+    toText,
+    undo
   };
 
 };
