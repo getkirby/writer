@@ -8,16 +8,22 @@ export default (container) => {
 
   return {
     ancestor() {
-      return this.range().commonAncestorContainer;
+      const range = this.range();
+      return range ? range.commonAncestorContainer : null;
     },
     containerRect() {
-      let range = document.createRange();
+      const range = document.createRange();
       range.selectNodeContents(container);
-      const rect = range.getBoundingClientRect();
-      return rect;
+      return range.getBoundingClientRect();
     },
     start() {
-      return this.rangeBeforeCursor().toString().length;
+      const rangeBeforeCursor = this.rangeBeforeCursor();
+
+      if (!rangeBeforeCursor) {
+        return 0;
+      }
+
+      return rangeBeforeCursor.toString().length;
     },
     end() {
       return this.start() + this.length();
@@ -34,27 +40,51 @@ export default (container) => {
       return this.text().length;
     },
     object() {
-      return window.getSelection() || {};
+      return window.getSelection();
     },
-    range() {
-      return this.object().getRangeAt(0);
+    range(clone = false) {
+      const selection = this.object();
+      let range = null;
+
+      if (!selection) {
+        return null;
+      }
+
+      try {
+        range = selection.getRangeAt(0);
+      } catch (e) {
+        return null;
+      }
+
+      return clone === true ? range.cloneRange() : range;
     },
     rangeAfterCursor() {
       const range = this.range();
-      const copy = range.cloneRange();
+      const copy  = this.range(true);
+
+      if (!range || !copy) {
+        return null;
+      }
+
       copy.selectNodeContents(container);
       copy.setStart(range.endContainer, range.endOffset);
       return copy;
     },
     rangeBeforeCursor() {
       const range = this.range();
-      const copy = range.cloneRange();
+      const copy  = this.range(true);
+
+      if (!range || !copy) {
+        return null;
+      }
+
       copy.selectNodeContents(container);
       copy.setEnd(range.startContainer, range.startOffset);
       return copy;
     },
     rect() {
-      return this.range().getBoundingClientRect();
+      const range = this.range();
+      return range ? range.getBoundingClientRect() : false;
     },
     select(start, end) {
       end = end || start;
@@ -66,7 +96,8 @@ export default (container) => {
       range.select(container);
     },
     text() {
-      return this.range().toString();
+      const range = this.range();
+      return range ? range.toString() : "";
     }
   };
 };
