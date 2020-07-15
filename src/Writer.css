@@ -3,6 +3,10 @@
   white-space: pre-wrap;
   line-height: 1.5em;
 }
+.k-writer:empty::after {
+  content: attr(data-placeholder);
+  color: rgba(0,0,0, .5);
+}
 .k-writer code {
   font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
   background: #efefef;

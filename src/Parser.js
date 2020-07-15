@@ -16,6 +16,7 @@ export default (node, formats = {}) => {
     "acronym",
     "cite",
     "code",
+    "del",
     "dfn",
     "em",
     "kbd",
@@ -85,7 +86,7 @@ export default (node, formats = {}) => {
 
         if (inline.includes(child.nodeName.toLowerCase()) === false) {
           chars.push({
-            text: "\n",
+            text: " ",
             format: {}
           });
         }

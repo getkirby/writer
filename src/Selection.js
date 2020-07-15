@@ -9,38 +9,35 @@ export default (container) => {
   return {
     ancestor() {
       const range = this.range();
-      return range ? range.commonAncestorContainer : null;
+      return range ? range.commonAncestorContainer : container;
+    },
+    container() {
+      return container;
     },
     containerRect() {
       const range = document.createRange();
       range.selectNodeContents(container);
       return range.getBoundingClientRect();
     },
-    start() {
-      const rangeBeforeCursor = this.rangeBeforeCursor();
-
-      if (!rangeBeforeCursor) {
-        return 0;
-      }
-
-      return rangeBeforeCursor.toString().length;
-    },
     end() {
       return this.start() + this.length();
     },
     /**
-    * Checks if the selection is within
-    * the container
-    */
+     * Checks if the selection is within
+     * the container
+     */
     isWithin() {
+      if (!this.range()) {
+        return false;
+      }
       const ancestor = this.ancestor();
-      return (ancestor == container || container.contains(ancestor));
+      return ancestor === container || container.contains(ancestor);
     },
     length() {
       return this.text().length;
     },
     object() {
-      return window.getSelection();
+      return document.getSelection();
     },
     range(clone = false) {
       const selection = this.object();
@@ -60,7 +57,7 @@ export default (container) => {
     },
     rangeAfterCursor() {
       const range = this.range();
-      const copy  = this.range(true);
+      const copy = this.range(true);
 
       if (!range || !copy) {
         return null;
@@ -72,7 +69,7 @@ export default (container) => {
     },
     rangeBeforeCursor() {
       const range = this.range();
-      const copy  = this.range(true);
+      const copy = this.range(true);
 
       if (!range || !copy) {
         return null;
@@ -94,6 +91,15 @@ export default (container) => {
 
       // Select some content
       range.select(container);
+    },
+    start() {
+      const rangeBeforeCursor = this.rangeBeforeCursor();
+
+      if (!rangeBeforeCursor) {
+        return 0;
+      }
+
+      return rangeBeforeCursor.toString().length;
     },
     text() {
       const range = this.range();

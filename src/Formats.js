@@ -4,7 +4,17 @@ export default {
       return `<strong>${content}</strong>`;
     },
     parser(node) {
-      return ["B", "STRONG"].includes(node.nodeName);
+      if (["B", "STRONG"].includes(node.nodeName)) {
+        return true;
+      }
+
+      const bold = ["bold", "bolder", "500", "600", "700", "800", "900"];
+
+      if (bold.includes(node.style.fontWeight)) {
+        return true;
+      }
+
+      return false;
     }
   },
   code: {
@@ -20,20 +30,53 @@ export default {
       return `<em>${content}</em>`;
     },
     parser(node) {
-      return ["I", "EM"].includes(node.nodeName);
+      if (["I", "EM"].includes(node.nodeName)) {
+        return true;
+      }
+
+      if (node.style.fontStyle === "italic") {
+        return true;
+      }
+
+      return false;
     }
   },
   link: {
-    html(content, attr) {
-      return `<a href="${attr.href}">${content}</a>`;
+    html(content, attr = {}) {
+      if (!attr.href) {
+        return content;
+      }
+
+      let attrs = `href="${attr.href}"`;
+      let rel   = `rel="noopener noreferrer"`;
+
+      if (attr.rel) {
+        rel = `rel="noopener noreferrer ${attr.rel}"`;
+      }
+
+      if (attr.target) {
+        attrs += ` target="${attr.target}"`;
+      }
+
+      if (attr.title) {
+        attrs += ` title="${attr.title}"`;
+      }
+
+      return `<a ${attrs} ${rel}>${content}</a>`;
     },
     parser(node) {
       if (node.nodeName !== "A") {
         return false;
       }
 
+      const href = node.getAttribute("href");
+
+      if (!href) {
+        return false;
+      }
+
       return {
-        href: node.getAttribute("href"),
+        href: href,
         rel: node.getAttribute("rel"),
         target: node.getAttribute("target"),
         title: node.getAttribute("title"),
@@ -45,7 +88,15 @@ export default {
       return `<del>${content}</del>`;
     },
     parser(node) {
-      return node.nodeName === "DEL";
+      if (node.nodeName === "DEL") {
+        return true;
+      }
+
+      if (node.style.textDecoration === "line-through") {
+        return true;
+      }
+
+      return false;
     }
   },
   subscript: {
@@ -53,7 +104,15 @@ export default {
       return `<sub>${content}</sub>`;
     },
     parser(node) {
-      return node.nodeName === "SUB";
+      if (node.nodeName === "SUB") {
+        return true;
+      }
+
+      if (node.style.verticalAlign === "sub") {
+        return true;
+      }
+
+      return false;
     }
   },
   superscript: {
@@ -61,7 +120,15 @@ export default {
       return `<sup>${content}</sup>`;
     },
     parser(node) {
-      return node.nodeName === "SUP";
+      if (node.nodeName === "SUP") {
+        return true;
+      }
+
+      if (node.style.verticalAlign === "super") {
+        return true;
+      }
+
+      return false;
     }
   },
 };

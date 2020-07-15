@@ -15,15 +15,15 @@ export default (element, params = {}) => {
   const options = { ...defaults, ...params };
   const history = History(options.history);
 
-  let doc = Parser(element, options.formats);
+  let doc = element ? Parser(element, options.formats) : [];
 
-  const activeFormats = (start, end) => {
-    start = startAt(start);
-    end = startAt(end);
+  const activeFormats = (start, length) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
 
     let formats = [];
 
-    for (let x = start; x < end; x++) {
+    for (let x = start; x < start + length; x++) {
       const character = doc[x];
       if (character) {
         Object.keys(character.format).forEach(formatName => {
@@ -32,7 +32,7 @@ export default (element, params = {}) => {
             * check if this format applies to all
             * characters in the selection
             */
-            if (hasFormat(formatName, start, end)) {
+            if (hasFormat(formatName, start, length)) {
               formats.push(formatName);
             }
           }
@@ -43,13 +43,10 @@ export default (element, params = {}) => {
     return formats;
   };
 
-  const activeLink = (start, end) => {
-    start = startAt(start);
-    end = startAt(end);
-
+  const activeLink = (start, length) => {
     let link = false;
 
-    get(start, end).forEach(char => {
+    get(start, length).forEach(char => {
       Object.keys(char.format).forEach(formatName => {
         if (formatName === "link") {
           link = char.format.link;
@@ -60,11 +57,11 @@ export default (element, params = {}) => {
     return link;
   };
 
-  const addFormat = (format, attributes, start, end) => {
-    start = startAt(start);
-    end   = endAt(end);
+  const addFormat = (format, start, length, attributes) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
 
-    for (let x = start; x < end; x++) {
+    for (let x = start; x < start + length; x++) {
       if (doc[x]) {
         doc[x].format[format] = attributes || true;
       }
@@ -74,12 +71,12 @@ export default (element, params = {}) => {
       format,
       attributes,
       start,
-      end
+      length
     })
   };
 
   const append = (content) => {
-    doc.concat(content);
+    doc = doc.concat(content);
     commit(doc, "append", { content });
   };
 
@@ -94,19 +91,19 @@ export default (element, params = {}) => {
   };
 
   const endAt = (end) => {
-    if (end === undefined || end === false) {
+    if (Number.isInteger(end) === false || end === -1) {
       return doc.length - 1;
     }
 
     return end;
   };
 
-  const get = (start, end) => {
-    start = startAt(start);
-    end = endAt(end);
+  const get = (start, length) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
     let result = [];
 
-    for (let x = start; x < end; x++) {
+    for (let x = start; x < start + length; x++) {
       if (doc[x]) {
         result.push(doc[x]);
       }
@@ -115,11 +112,11 @@ export default (element, params = {}) => {
     return result;
   };
 
-  const hasFormat = (format, start, end) => {
+  const hasFormat = (format, start, length) => {
     start = startAt(start);
-    end = endAt(end);
+    length = length || lengthAfter(start);
 
-    for (let x = start; x < end; x++) {
+    for (let x = start; x < start + length; x++) {
       if (doc[x].format[format] != undefined === false) {
         return false;
       }
@@ -147,23 +144,64 @@ export default (element, params = {}) => {
     }
 
     elementFormats.forEach(formatName => {
-      html = options.formats[formatName].html(html, element.format[formatName]);
+      if (options.formats[formatName]) {
+        html = options.formats[formatName].html(html, element.format[formatName]);
+      } else {
+        html = element.text;
+      }
     });
 
     return html;
   };
 
-  const insertText = (text, start) => {
+  const inject = (items, start) => {
     start = endAt(start);
 
-    const format = doc[start] ? doc[start].format : {};
+    doc = [
+      ...doc.slice(0, start),
+      ...items,
+      ...doc.slice(start)
+    ];
 
-    doc.splice(start, 0, {
+    commit(doc, "inject", { items, start: start + 1 });
+  };
+
+  const insertText = (text, position) => {
+    if (text.length === 0) {
+      return;
+    }
+
+    // insert multiple characters at once
+    if (text.length > 1) {
+      [...text].forEach(character => {
+        insertText(character, position);
+        position++;
+      });
+      return;
+    }
+
+    // sanitize the position
+    position = Number.isInteger(position) ? position : doc.length;
+
+    // copy the format at the starting position
+    const format = doc[position] ? doc[position].format : {};
+
+    doc.splice(position, 0, {
       text: text,
       format: format
     });
 
-    commit(doc, "insertText", { text, start: start + 1 });
+    commit(doc, "insertText", { text, start: position + 1 });
+  };
+
+  const length = () => {
+    return doc.length;
+  };
+
+  const lengthAfter = (start) => {
+    start = start || 0;
+    let lengthAfter = length() - start;
+    return lengthAfter < 0 ? 0 : lengthAfter;
   };
 
   const recall = (action, callback) => {
@@ -186,35 +224,35 @@ export default (element, params = {}) => {
     });
   };
 
-  const removeFormat = (format, start, end) => {
-    start = startAt(start);
-    end   = endAt(end);
+  const removeFormat = (format, start, length) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
 
-    for (let x = start; x < end; x++) {
+    for (let x = start; x < start + length; x++) {
       delete doc[x].format[format];
     }
 
-    commit(doc, "removeFormat", { format, start, end });
+    commit(doc, "removeFormat", { format, start, length });
   };
 
-  const removeFormats = (start, end) => {
-    start = startAt(start);
-    end   = endAt(end);
+  const removeFormats = (start, length) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
 
-    for (let x = start; x < end; x++) {
+    for (let x = start; x < start + length; x++) {
       doc[x].format = {};
     }
 
-    commit(doc, "removeFormats", { start, end });
+    commit(doc, "removeFormats", { start, length });
   };
 
-  const removeText = (start, length) => {
-    start  = endAt(start);
-    length = (!length || length < 1) ? 1 : length;
+  const removeText = (position, length) => {
+    position = endAt(position);
+    length   = (!length || length < 1) ? 1 : length;
 
-    doc.splice(start, length);
+    doc.splice(position, length);
 
-    commit(doc, "removeText", { start, length });
+    commit(doc, "removeText", { position, length });
   };
 
   const replace = (newDoc) => {
@@ -223,27 +261,24 @@ export default (element, params = {}) => {
   };
 
   const startAt = (start) => {
-    return start || 0;
+    return Number.isInteger(start) ? start : 0;
   };
 
-  const toggleFormat = (format, attributes, start, end) => {
-    start = startAt(start);
-    end   = endAt(end);
-
-    if (hasFormat(format, start, end)) {
-      removeFormat(format, start, end);
+  const toggleFormat = (format, start, length, attributes) => {
+    if (hasFormat(format, start, length)) {
+      removeFormat(format, start, length);
     } else {
-      addFormat(format, attributes, start, end);
+      addFormat(format, start, length, attributes);
     }
   };
 
-  const toHtml = (start, end) => {
-    start = startAt(start);
-    end = endAt(end);
+  const toHtml = (start, length) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
 
     let html = [];
 
-    toJson(start, end).forEach(curr => {
+    toJson(start, length).forEach(curr => {
       html.push(htmlElement(curr));
     });
 
@@ -256,11 +291,11 @@ export default (element, params = {}) => {
     return html;
   };
 
-  const toJson = (start, end) => {
-    start = startAt(start);
-    end = endAt(end);
+  const toJson = (start, length) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
 
-    const d = clone().slice(start, end);
+    const d = clone().slice(start, length);
 
     let json = [];
     let step = -1;
@@ -284,10 +319,13 @@ export default (element, params = {}) => {
     return json;
   };
 
-  const toText = (start, end) => {
+  const toText = (start, length) => {
+    start  = startAt(start);
+    length = length || lengthAfter(start);
+
     let text = "";
 
-    clone().slice(start, end).forEach(curr => {
+    clone().slice(start, length).forEach(curr => {
       text += curr.text;
     });
 
@@ -313,7 +351,10 @@ export default (element, params = {}) => {
     doc,
     get,
     hasFormat,
+    inject,
     insertText,
+    length,
+    lengthAfter,
     redo,
     removeFormat,
     removeFormats,

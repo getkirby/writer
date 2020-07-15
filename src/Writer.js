@@ -30,6 +30,7 @@ export default (element, params) => {
     onSelectionEnd: () => {},
     onSelectionStart: () => {},
     onUndo: () => {},
+    placeholder: "",
     shortcuts: {},
     spellcheck: true
   };
@@ -39,8 +40,8 @@ export default (element, params) => {
 
   const onHistory = (doc, action, args) => {
     update();
-    if (args && (args.start || args.end)) {
-      selection.select(args.start, args.end);
+    if (args && args.start) {
+      select(args.start, args.length);
     }
   };
 
@@ -63,6 +64,7 @@ export default (element, params) => {
   let isSelecting = false;
 
   element.setAttribute("contenteditable", true);
+  element.setAttribute("data-placeholder", options.placeholder);
   element.setAttribute("spellcheck", options.spellcheck);
 
   /**
@@ -119,12 +121,12 @@ export default (element, params) => {
       format("italic");
     },
     link(href) {
-      const start = selection.start();
-      const end = selection.end();
+      const start  = selection.start();
+      const length = selection.length();
 
-      doc.addFormat("link", { href }, start, end);
+      doc.addFormat("link", start, length, { href });
       update();
-      select(start, end);
+      select(start, length);
     },
     paste(html) {
       let cursorPosition = cursor.position();
@@ -133,9 +135,9 @@ export default (element, params) => {
 
       const parsed = Parser(container, formats);
 
-      doc.append(parsed);
+      doc.inject(parsed, cursorPosition);
       update();
-      select(cursorPosition);
+      select(cursorPosition + parsed.length);
     },
     strikeThrough() {
       format("strikeThrough");
@@ -147,12 +149,12 @@ export default (element, params) => {
       format("superscript");
     },
     unlink() {
-      const start = selection.start();
-      const end = selection.end();
+      const start  = selection.start();
+      const length = selection.length();
 
-      doc.removeFormat("link", start, end);
+      doc.removeFormat("link", start, length);
       update();
-      select(start, end);
+      select(start, length);
     }
   };
 
@@ -161,8 +163,8 @@ export default (element, params) => {
    */
   const activeFormats = () => {
     const start = selection.start();
-    const end = selection.end();
-    return doc.activeFormats(start, end);
+    const length = selection.length();
+    return doc.activeFormats(start, length);
   };
 
   /**
@@ -170,9 +172,9 @@ export default (element, params) => {
    * in the document selection
    */
   const activeLink = () => {
-    const start = selection.start();
-    const end = selection.end();
-    return doc.activeLink(start, end);
+    const start  = selection.start();
+    const length = selection.length();
+    return doc.activeLink(start, length);
   };
 
   /**
@@ -191,12 +193,12 @@ export default (element, params) => {
    * and optional attributes
    */
   const format = (format, attributes) => {
-    const start = selection.start();
-    const end = selection.end();
+    const start  = selection.start();
+    const length = selection.length();
 
-    doc.toggleFormat(format, attributes, start, end);
+    doc.toggleFormat(format, start, length, attributes);
     update();
-    select(start, end);
+    select(start, length);
   };
 
   const onSelectionEnd = () => {
@@ -223,9 +225,9 @@ export default (element, params) => {
   /**
    * Select text in the editor
    */
-  const select = (start, end) => {
+  const select = (start, length) => {
     isSelecting = true;
-    selection.select(start, end);
+    selection.select(start, start + (length || 0));
   };
 
   /**
@@ -304,7 +306,7 @@ export default (element, params) => {
     event.preventDefault();
 
     const clipboardData = event.clipboardData || window.clipboardData;
-    const html = clipboardData.getData('text/html') || clipboarData.getData("text");
+    const html = clipboardData.getData('text/html') || clipboardData.getData("text");
 
     command("paste", html);
   });
@@ -429,14 +431,14 @@ export default (element, params) => {
     redo,
     select,
     selection,
-    toHtml(start, end) {
-      return doc.toHtml(start, end);
+    toHtml(start, length) {
+      return doc.toHtml(start, length);
     },
-    toJson(start, end) {
-      return doc.toJson(start, end);
+    toJson(start, length) {
+      return doc.toJson(start, length);
     },
-    toText(start, end) {
-      return doc.toText(start, end);
+    toText(start, length) {
+      return doc.toText(start, length);
     },
     undo,
     update
