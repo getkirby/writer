@@ -47,9 +47,7 @@ onChange() {
 
 > The API is not stable yet. Methods and properties are very likely to change.
 
-### Writer
-
-#### Instance
+### How to create a Writer instance
 
 To create a Writer instance, you need to pass a HTML node or query selector for the element that should be editable.
 
@@ -63,7 +61,7 @@ const writer = Writer(".writer");
 </script>
 ```
 
-#### Options
+### Options
 
 You can pass additional options to the Writer as second argument
 
@@ -82,32 +80,59 @@ const writer = Writer(".writer", {
 </script>
 ```
 
-##### `breaks: true`
+#### `breaks: true`
 Enables/disables line breaks within the text. Line breaks are enabled by default.
 
-##### `formats: {}`
+#### `formats: {}`
 You can overwrite or extend the available inline formats with the formats object. Check out `src/Formats.js` for all default formats.
 
-##### `onBlur: () => {}`
+#### `history: 100`
+The number of steps that can be undone in the history.
+
+#### `onBlur: () => {}`
 Add an event when the Writer looses focus
 
-##### `onChange: () => {}`
+#### `onChange: () => {}`
 React on any content changes in the Writer. This is the method to be used if you want to preview or save the Writer content. You probably want to use `writer.toHtml()`, `writer.toJson()` or `writer.toText()` in this method.
 
-##### `onFocus: () => {}`
+#### `onFocus: () => {}`
 Add an event when the Writer gains focus
 
-##### `onSelection: () => {}`
+#### `onKeydown: () => {}`
+This event is triggered when a native keydown event happens in the Writer. This event is triggered before the any Writer shortcut. 
+
+#### `onKeyup: () => {}`
+This event is triggered when a native keyup event happens in the Writer. 
+
+#### `onMousedown: () => {}`
+This event is triggered when a native mousedown event happens in the Writer. 
+
+#### `onMouseup: () => {}`
+This event is triggered when a native mouseup event happens in the Writer. 
+
+#### `onRedo: () => {}`
+This event is triggered when history changes are reverted
+
+#### `onSelection: () => {}`
 This event is triggered when a selection is made and changed.
 
-##### `onSelectionEnd: () => {}`
+#### `onSelectionEnd: () => {}`
 This event is only fired when the selection no longer changes (on mouseup)
 
-##### `onSelectionStart: () => {}`
+#### `onSelectionStart: () => {}`
 This event is fired when the selection starts
 
-##### `shortcuts: {}`
+#### `onUndo: () => {}`
+This event is triggered when content changes are undone. 
+
+#### `placeholder: ""`
+Add a placeholder text to the Writer when there's no content.
+
+#### `shortcuts: {}`
 You can pass your own keyboard shortcuts or overwrite existing shortcuts with this object. Keyboard shortcuts are defined like this:
+
+#### `spellcheck: true`
+Enable/disable native spellchecking
 
 ```js
 const shortcuts = {
@@ -118,13 +143,13 @@ const shortcuts = {
 ```
 The following special keywords for key combinations are automatically injected when pressed (in the following order): `Meta`, `Alt`, `Ctrl`, `Shift`
 
-#### Methods
+### Methods
 
-##### `writer.activeFormats()`
+#### `writer.activeFormats()`
 
 Returns an array of all active formats at the current selection. A format must be present at all characters in the selection to be included.
 
-##### `writer.activeLink()`
+#### `writer.activeLink()`
 
 Returns an object with attributes of the active link if the selected text has a link. The object contains `href`, `rel`, `title`, and `target`:
 
@@ -138,176 +163,176 @@ Returns an object with attributes of the active link if the selected text has a 
 }
 ```
 
-##### `writer.command(commandName, ...args)`
+#### `writer.command(commandName, ...args)`
 
 Executes the given command with the optional arguments. Available commands:
 
 -----
 
-###### `writer.command('bold')`
+##### `writer.command('bold')`
 
 Wraps the selected text in a `<strong>` tag.
 
-###### `writer.command('code')`
+##### `writer.command('code')`
 
 Wraps the selected text in a `<code>` tag.
 
-###### `writer.command('delete')`
+##### `writer.command('delete')`
 
 Deletes the selected text before the cursor
 
-###### `writer.command('deleteForward')`
+##### `writer.command('deleteForward')`
 
 Deletes the selected text after the cursor
 
-###### `writer.command('enter')`
+##### `writer.command('enter')`
 
 Adds a line break if breaks are enabled.
 
-###### `writer.command('insert', text, at)`
+##### `writer.command('insert', text, at)`
 
 Inserts text at the given position.
 
-###### `writer.command('italic')`
+##### `writer.command('italic')`
 
 Wraps the selected text in an `<em>` tag
 
-###### `writer.command('link', href)`
+##### `writer.command('link', href)`
 
 Wraps the selected text in an `<a>` tag with the given value for the `href` attribute.
 
-###### `writer.command('paste', html)`
+##### `writer.command('paste', html)`
 
 Pastes any unsanitized html at the given selection/cursor. The html will be handled by the parser and all unwanted formats will be stripped. Block elements are of ignored and converted to line breaks if it makes sense.
 
-###### `writer.command('strikeThrough')`
+##### `writer.command('strikeThrough')`
 
 Wraps the selected text in an `<del>` tag
 
-###### `writer.command('subscript')`
+##### `writer.command('subscript')`
 
 Wraps the selected text in an `<sub>` tag
 
-###### `writer.command('superscript')`
+##### `writer.command('superscript')`
 
 Wraps the selected text in an `<sup>` tag
 
-###### `writer.command('unlink')`
+##### `writer.command('unlink')`
 
 Removes a link from the selected text, if it exists.
 
 -----
 
-##### `writer.cursor()`
+#### `writer.cursor()`
 
 Returns the cursor object with additional methods to inspect and manipulate the cursor:
 
-###### `writer.cursor().isInFirstLine()`
+##### `writer.cursor().isInFirstLine()`
 
 Checks if the cursor is in the first line of text
 
-###### `writer.cursor().isInLastLine()`
+##### `writer.cursor().isInLastLine()`
 
 Checks if the cursor is in the last line of text
 
-###### `writer.cursor().rect()`
+##### `writer.cursor().rect()`
 
 Returns the DOMRect object for the absolute cursor position
 
-###### `writer.cursor().set(position)`
+##### `writer.cursor().set(position)`
 
 Moves the cursor to the given position
 
 
 -----
 
-##### `writer.redo()`
+#### `writer.redo()`
 
 Reverts the last undo event
 
-##### `writer.select(start, length)`
+#### `writer.select(start, length)`
 
 Select the text from the start position for the given length. If you only specify a start position, the cursor will be set to that point and there will be no spanning selection.
 
-##### `writer.selection()`
+#### `writer.selection()`
 
 Returns the current selection object with additional methods to inspect and manipulate the selection
 
-###### `writer.selection().ancestor()`
+##### `writer.selection().ancestor()`
 
 Returns the common ancestor element of the current selection
 
-###### `writer.selection().container()`
+##### `writer.selection().container()`
 
 Returns the writer element
 
-###### `writer.selection().containerRect()`
+##### `writer.selection().containerRect()`
 
 Returns the largest possible selection DOMRect for the element. This is useful if you want to compare the current selection to the rest of the content
 
-###### `writer.selection().end()`
+##### `writer.selection().end()`
 
 Returns the position of the selection end
 
-###### `writer.selection().isWithin()`
+##### `writer.selection().isWithin()`
 
 Checks if the selection is within the writer container
 
-###### `writer.selection().length()`
+##### `writer.selection().length()`
 
 Returns the length of the selected text
 
-###### `writer.selection().object()`
+##### `writer.selection().object()`
 
 Returns the native selection object
 
-###### `writer.selection().range(clone = false)`
+##### `writer.selection().range(clone = false)`
 
 Returns the currently active range object (or null)
 
-###### `writer.selection().rangeAfterCursor()`
+##### `writer.selection().rangeAfterCursor()`
 
 Returns the range object before the cursor
 
-###### `writer.selection().rangeBeforeCursor()`
+##### `writer.selection().rangeBeforeCursor()`
 
 Returns the range object after the cursor
 
-###### `writer.selection().rect()`
+##### `writer.selection().rect()`
 
 Returns the DOMRect of the current selection
 
-###### `writer.selection().select(start, end)`
+##### `writer.selection().select(start, end)`
 
 Creates a new selection at the start and end point
 
-###### `writer.selection().start()`
+##### `writer.selection().start()`
 
 Returns the start position of the selection
 
-###### `writer.selection().text()`
+##### `writer.selection().text()`
 
 Returns the selected text
 
 -----
 
-##### `writer.toHtml(start, length)`
+#### `writer.toHtml(start, length)`
 
 Returns the current Writer content as sanitized HTML
 
-##### `writer.toJson(start, length)`
+#### `writer.toJson(start, length)`
 
 Returns the current Writer content as JSON object
 
-##### `writer.toText(start, length)`
+#### `writer.toText(start, length)`
 
 Returns the current Writer content as plain text.
 
-##### `writer.undo()`
+#### `writer.undo()`
 
 Reverts the last step in history
 
-##### `writer.update()`
+#### `writer.update()`
 
 Triggers a writer update manually. This will update the HTML in the writer according to the current document state. It will also trigger the `onChange` event.
 
