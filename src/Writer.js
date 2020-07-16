@@ -1,7 +1,6 @@
 import Cursor from "./Cursor.js";
 import DefaultFormats from "./Formats.js";
 import Document from "./Document.js";
-import History from "./History.js";
 import Selection from "./Selection.js";
 import Parser from "./Parser.js";
 
