@@ -43,6 +43,20 @@ onChange() {
 </script>
 ```
 
+### Install via npm 
+
+```
+npm i @getkirby/writer
+```
+
+Import it into your project …
+
+```js
+import Writer from "@getkirby/writer";
+
+const writer = Writer(".writer");
+```
+
 ## Documentation
 
 > The API is not stable yet. Methods and properties are very likely to change.
