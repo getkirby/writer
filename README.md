@@ -33,7 +33,7 @@ https://writer.getkirby.com
 <div class="writer" contenteditable>Hello <b>world</b></div>
 
 <script type="module">
-import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/src/Writer.js";
+import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/dist/Writer.min.js";
 
 const writer = Writer(".writer", {
 onChange() {
@@ -55,7 +55,7 @@ To create a Writer instance, you need to pass a HTML node or query selector for 
 <div class="writer" contenteditable></div>
 
 <script type="module">
-import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/src/Writer.js";
+import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/dist/Writer.min.js";
 
 const writer = Writer(".writer");
 </script>
@@ -69,7 +69,7 @@ You can pass additional options to the Writer as second argument
 <div class="writer" contenteditable></div>
 
 <script type="module">
-import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/src/Writer.js";
+import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/dist/Writer.min.js";
 
 const writer = Writer(".writer", {
     breaks: false,
@@ -99,16 +99,16 @@ React on any content changes in the Writer. This is the method to be used if you
 Add an event when the Writer gains focus
 
 #### `onKeydown: () => {}`
-This event is triggered when a native keydown event happens in the Writer. This event is triggered before the any Writer shortcut. 
+This event is triggered when a native keydown event happens in the Writer. This event is triggered before the any Writer shortcut.
 
 #### `onKeyup: () => {}`
-This event is triggered when a native keyup event happens in the Writer. 
+This event is triggered when a native keyup event happens in the Writer.
 
 #### `onMousedown: () => {}`
-This event is triggered when a native mousedown event happens in the Writer. 
+This event is triggered when a native mousedown event happens in the Writer.
 
 #### `onMouseup: () => {}`
-This event is triggered when a native mouseup event happens in the Writer. 
+This event is triggered when a native mouseup event happens in the Writer.
 
 #### `onRedo: () => {}`
 This event is triggered when history changes are reverted
@@ -123,7 +123,7 @@ This event is only fired when the selection no longer changes (on mouseup)
 This event is fired when the selection starts
 
 #### `onUndo: () => {}`
-This event is triggered when content changes are undone. 
+This event is triggered when content changes are undone.
 
 #### `placeholder: ""`
 Add a placeholder text to the Writer when there's no content.
@@ -335,6 +335,40 @@ Reverts the last step in history
 #### `writer.update()`
 
 Triggers a writer update manually. This will update the HTML in the writer according to the current document state. It will also trigger the `onChange` event.
+
+## CSS
+
+The Writer does not need a lot of CSS to work. You can find the suggested CSS in `writer.css`:
+
+```css
+.writer {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  white-space: pre-wrap;
+  line-height: 1.5em;
+}
+.writer:empty::after {
+  content: attr(data-placeholder);
+  color: rgba(0,0,0, .5);
+}
+.writer code {
+  font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
+  background: #efefef;
+  font-size: .925rem;
+  padding: 0 .125em;
+  display: inline-block;
+  border-radius: 3px;
+}
+.writer strong {
+  font-weight: bold;
+}
+.writer em {
+  font-style: italic;
+}
+.writer a {
+  text-decoration: underline;
+  color: currentColor;
+}
+```
 
 ## Contributing
 

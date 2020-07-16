@@ -1,13 +1,13 @@
-.k-writer {
+.writer {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   white-space: pre-wrap;
   line-height: 1.5em;
 }
-.k-writer:empty::after {
+.writer:empty::after {
   content: attr(data-placeholder);
   color: rgba(0,0,0, .5);
 }
-.k-writer code {
+.writer code {
   font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
   background: #efefef;
   font-size: .925rem;
@@ -15,13 +15,13 @@
   display: inline-block;
   border-radius: 3px;
 }
-.k-writer strong {
+.writer strong {
   font-weight: bold;
 }
-.k-writer em {
+.writer em {
   font-style: italic;
 }
-.k-writer a {
+.writer a {
   text-decoration: underline;
   color: currentColor;
 }

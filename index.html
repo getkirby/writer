@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="./src/Writer.css">
+<link rel="stylesheet" href="./writer.css">
 <style>
 
   * {
@@ -7,13 +7,13 @@
     margin: 0;
   }
 
-  .k-writer {
+  .writer {
     height: 100%;
     border: 0;
     padding: 3rem;
   }
 
-  .k-writer:focus {
+  .writer:focus {
     outline: none;
   }
 
@@ -46,11 +46,13 @@
     color: #fff;
     box-shadow: rgba(0,0,0, .25) 0 5px 10px;
   }
+
   .toolbar hr {
     border: 0;
     width: 1px;
     background: rgba(255,255,255, .25);
   }
+
   .toolbar button {
     border: 0;
     background: none;
@@ -58,6 +60,7 @@
     color: currentColor;
     cursor: pointer;
   }
+
   .toolbar button.active {
     color: #7e9abf;
   }
@@ -68,23 +71,25 @@
 
   <div>
     <div class="toolbar">
-      <button data-command="bold">B</button>
-      <button data-command="italic"><i>i</i></button>
-      <button data-command="strikeThrough"><del>S</del></button>
+      <button type="button" data-command="bold">B</button>
+      <button type="button" data-command="italic"><i>i</i></button>
+      <button type="button" data-command="strikeThrough"><del>S</del></button>
       <hr>
-      <button data-command="code">Code</button>
+      <button type="button" data-command="code">Code</button>
       <hr>
-      <button data-command="link"><u>Link</u></button>
+      <button type="button" data-command="link"><u>Link</u></button>
     </div>
 
-    <div class="k-writer"></div>
+    <div class="writer"></div>
   </div>
 
   <code><pre class="preview"></pre></code>
 
 </main>
 
-<a class="github" href="https://github.com/getkirby/writer"><img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+<a class="github" href="https://github.com/getkirby/writer">
+  <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
+</a>
 
 <script type="module">
 import Toolbar from "./src/Toolbar.js";
@@ -133,7 +138,7 @@ const updatePreview = () => {
 /**
  * Writer instance
  */
-window.writer = Writer(".k-writer", {
+window.writer = Writer(".writer", {
   breaks: true,
   onChange() {
     updatePreview();
