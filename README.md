@@ -23,6 +23,10 @@ For such block editors, a fully fledged WYSIWYG editor is way too much. What the
 
 This library also does not support any legacy browsers. We don't have to care about IE and some outdated selection APIs. It's fully written in ES6 and is aimed at browsers that support ES6 modules by default. https://caniuse.com/#feat=es6-module
 
+## It's pretty small
+
+14 kb compressed / 39 kb uncompressed – we are really proud of its small footprint. 
+
 ## Demo
 
 https://writer.getkirby.com
