@@ -345,6 +345,14 @@ export default (element, params) => {
     pressed = pressed.join("+");
 
     /**
+     * Backspace and Delete should ignore
+     * all modifier keys
+     */
+    if (["Backspace", "Delete"].includes(event.key)) {
+      pressed = event.key;
+    }
+
+    /**
      * History
      */
     if (pressed === "Meta+z") {

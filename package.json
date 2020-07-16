@@ -5,8 +5,8 @@
   "scripts": {
     "cy:run": "cypress run",
     "cy:open": "cypress open",
-    "start": "live-server",
-    "test": "npm start & wait-on http://127.0.0.1:8080 & cypress run"
+    "start": "live-server --port=8181",
+    "test": "npm start & wait-on http://127.0.0.1:8181 & cypress run"
   },
   "repository": {
     "type": "git",

@@ -19,7 +19,7 @@ const writer = (callback) => {
 describe("Writer", () => {
 
   beforeEach(() => {
-    cy.visit("http://127.0.0.1:8080");
+    cy.visit("http://127.0.0.1:8181");
     cy.get(".k-writer").as("writer");
     cy.get(".toolbar").as("toolbar");
   });
@@ -105,5 +105,68 @@ describe("Writer", () => {
     });
   });
 
-});
+  it("should ignore meta key on backspace", () => {
+    write("Hello");
+    write("{meta}{backspace}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
 
+  it("should ignore meta key on delete", () => {
+    write("Hello");
+    write("{leftarrow}{meta}{del}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+  it("should ignore alt key on backspace", () => {
+    write("Hello");
+    write("{alt}{backspace}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+  it("should ignore alt key on delete", () => {
+    write("Hello");
+    write("{leftarrow}{alt}{del}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+  it("should ignore ctrl key on backspace", () => {
+    write("Hello");
+    write("{ctrl}{backspace}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+  it("should ignore ctrl key on delete", () => {
+    write("Hello");
+    write("{leftarrow}{ctrl}{del}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+  it("should ignore shift key on backspace", () => {
+    write("Hello");
+    write("{shift}{backspace}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+  it("should ignore shift key on delete", () => {
+    write("Hello");
+    write("{leftarrow}{shift}{del}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+});
