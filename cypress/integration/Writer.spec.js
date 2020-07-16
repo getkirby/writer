@@ -19,7 +19,7 @@ const writer = (callback) => {
 describe("Writer", () => {
 
   beforeEach(() => {
-    cy.visit("http://localhost:8181");
+    cy.visit("http://127.0.0.1:8080");
     cy.get(".k-writer").as("writer");
     cy.get(".toolbar").as("toolbar");
   });

@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "Kirby writer is a modern opinionated WYSIWYG editor.",
   "scripts": {
-    "dev": "php -S localhost:8181"
+    "cy:run": "cypress run",
+    "cy:open": "cypress open",
+    "start": "live-server",
+    "test": "npm start & wait-on http://127.0.0.1:8080 & cypress run"
   },
   "repository": {
     "type": "git",
@@ -24,6 +27,8 @@
   },
   "homepage": "https://github.com/getkirby/writer#readme",
   "devDependencies": {
-    "cypress": "^4.10.0"
+    "cypress": "^4.10.0",
+    "live-server": "^1.2.1",
+    "wait-on": "^5.1.0"
   }
 }

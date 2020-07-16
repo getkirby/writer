@@ -342,15 +342,22 @@ There are still many things to get right before we can launch this project. It w
 
 ## Developing
 
-So far, this project does not have a build process or dedicated dev environment. Those are the steps to get started:
-
 1. Clone the repository
-2. `npm run dev` (this requires PHP as we use a simple PHP server so far) You can easily change this to your favorite simple server. Anything that can server HTML files should work.
-3. Start writing code
+2. `npm run i`
+3. `npm run start`
+4. Start writing code
 
 ## Testing
 
-We are using Cypress to run e2e and unit tests. Make sure to install the dependencies first with `npm i`. Run Cypress with `npx cypress open`
+We are using Cypress to run e2e and unit tests. Make sure to install the dependencies first with `npm i`.
+
+### via Cypress app
+
+Open the Cypress app with `npm run cy:open`
+
+### via command line
+
+Start all tests on the command line with `npm run test`
 
 ## License
 This editor is licensed under the MIT license and will stay open. It will not fall under our proprietary Kirby license. Promised!
