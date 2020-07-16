@@ -1,6 +1,6 @@
 # Kirby Writer
 
-A modern [WYSIWYG editor](https://writer.getkirby.com) for inline formats – by the team of [Kirby CMS](https://getkirby.com)
+A small, modern [WYSIWYG editor](https://writer.getkirby.com) for inline formats – by the team of [Kirby CMS](https://getkirby.com)
 
 <a href="https://writer.getkirby.com">![Kirby Writer](https://user-images.githubusercontent.com/24532/87658085-fd122e80-c75b-11ea-87ae-40f9c9da4e4c.png)
 </a>
