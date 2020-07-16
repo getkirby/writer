@@ -1,5 +1,5 @@
 {
-  "name": "kirby-writer",
+  "name": "@getkirby/writer",
   "version": "0.0.4",
   "description": "Kirby Writer is a modern WYSIWYG editor for inline formats – by the team of Kirby CMS",
   "scripts": {
