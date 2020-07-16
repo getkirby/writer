@@ -1,6 +1,6 @@
 # Kirby Writer
 
-A modern opinionated [WYSIWYG editor](https://writer.getkirby.com).
+A modern opinionated [WYSIWYG editor](https://writer.getkirby.com) by the team of [Kirby CMS](https://getkirby.com)
 
 ## About this editor
 
