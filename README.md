@@ -30,13 +30,13 @@ https://writer.getkirby.com
 <div class="writer" contenteditable>Hello <b>world</b></div>
 
 <script type="module">
-  import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/src/Writer.js";
+import Writer from "https://cdn.jsdelivr.net/gh/getkirby/writer@latest/src/Writer.js";
 
-  const writer = Writer(".writer", {
-    onChange() {
-      console.log(writer.toJson());
-    }
-  });
+const writer = Writer(".writer", {
+onChange() {
+    console.log(writer.toJson());
+}
+});
 </script>
 ```
 
@@ -199,19 +199,19 @@ Removes a link from the selected text, if it exists.
 
 Returns the cursor object with additional methods to inspect and manipulate the cursor:
 
-###### 'writer.cursor().isInFirstLine()`
+###### `writer.cursor().isInFirstLine()`
 
 Checks if the cursor is in the first line of text
 
-###### 'writer.cursor().isInLastLine()`
+###### `writer.cursor().isInLastLine()`
 
 Checks if the cursor is in the last line of text
 
-###### 'writer.cursor().rect()`
+###### `writer.cursor().rect()`
 
 Returns the DOMRect object for the absolute cursor position
 
-###### 'writer.cursor().set(position)`
+###### `writer.cursor().set(position)`
 
 Moves the cursor to the given position
 
