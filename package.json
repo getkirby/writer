@@ -1,7 +1,7 @@
 {
   "name": "kirby-writer",
-  "version": "0.0.1",
-  "description": "Kirby writer is a modern opinionated WYSIWYG editor.",
+  "version": "0.0.4",
+  "description": "Kirby Writer is a modern WYSIWYG editor for inline formats – by the team of Kirby CMS",
   "scripts": {
     "build": "rollup --config",
     "cy:run": "cypress run",
@@ -22,7 +22,7 @@
     "cms",
     "content"
   ],
-  "author": "Bastian Allgeier",
+  "author": "Bastian Allgeier <bastian@getkirby.com> (https://getkirby.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/getkirby/writer/issues"
