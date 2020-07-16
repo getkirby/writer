@@ -2,6 +2,8 @@
 
 A modern opinionated [WYSIWYG editor](https://writer.getkirby.com) by the team of [Kirby CMS](https://getkirby.com)
 
+<a href="https://writer.getkirby.com">![kirby-writer](https://user-images.githubusercontent.com/24532/87657565-4746e000-c75b-11ea-9c3b-cd585219b95f.png)</a>
+
 ## About this editor
 
 **This library is still experimental and looking for help to get finished. DO NOT USE IN PRODUCTION!**
