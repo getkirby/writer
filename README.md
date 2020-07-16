@@ -149,9 +149,6 @@ Add a placeholder text to the Writer when there's no content.
 #### `shortcuts: {}`
 You can pass your own keyboard shortcuts or overwrite existing shortcuts with this object. Keyboard shortcuts are defined like this:
 
-#### `spellcheck: true`
-Enable/disable native spellchecking
-
 ```js
 const shortcuts = {
     "Meta+b": () => {
@@ -160,6 +157,9 @@ const shortcuts = {
 };
 ```
 The following special keywords for key combinations are automatically injected when pressed (in the following order): `Meta`, `Alt`, `Ctrl`, `Shift`
+
+#### `spellcheck: true`
+Enable/disable native spellchecking
 
 ### Methods
 
