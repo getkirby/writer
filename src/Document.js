@@ -15,7 +15,13 @@ export default (element, params = {}) => {
   const options = { ...defaults, ...params };
   const history = History(options.history);
 
-  let doc = element ? Parser(element, options.formats) : [];
+  let doc;
+
+  if (Array.isArray(element) === true) {
+    doc = element;
+  } else {
+    doc = element ? Parser(element, options.formats) : [];
+  }
 
   const activeFormats = (start, length) => {
     start  = startAt(start);
