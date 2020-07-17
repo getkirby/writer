@@ -1,6 +1,6 @@
 {
   "name": "@getkirby/writer",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Kirby Writer is a modern WYSIWYG editor for inline formats – by the team of Kirby CMS",
   "scripts": {
     "build": "rollup --config",
