@@ -4,7 +4,19 @@ export default {
       return `<strong>${content}</strong>`;
     },
     parser(node) {
-      if (["B", "STRONG"].includes(node.nodeName)) {
+
+      const boldElements = [
+        "B",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "STRONG"
+      ];
+
+      if (boldElements.includes(node.nodeName)) {
         return true;
       }
 
