@@ -36,7 +36,19 @@ var DefaultFormats = {
       return `<strong>${content}</strong>`;
     },
     parser(node) {
-      if (["B", "STRONG"].includes(node.nodeName)) {
+
+      const boldElements = [
+        "B",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "STRONG"
+      ];
+
+      if (boldElements.includes(node.nodeName)) {
         return true;
       }
 
@@ -295,6 +307,128 @@ class History {
  */
 var History$1 = limit => new History(limit);
 
+/**
+ * Removes all block elements from the HTML
+ * and trims the result
+ */
+var Inliner = (node, inline) => {
+
+  const unwrapElement = (node) => {
+    // get the element's parent node
+    const parent = node.parentNode;
+
+    // move all children out of the element
+    while (node.firstChild) parent.insertBefore(node.firstChild, node);
+
+    // remove the empty element
+    parent.removeChild(node);
+  };
+
+  const isInline = (node) => {
+    return inline.includes(node.nodeName.toLowerCase());
+  };
+
+  const hasBlockElements = (node) => {
+    if (node.children.length === 0) {
+      return false;
+    }
+
+    let result = false;
+
+    Array.from(node.children).forEach(child => {
+      // check child
+      if (isInline(child) === false) {
+        result = true;
+        return;
+      }
+
+      // check children of child
+      if (hasBlockElements(child)) {
+        result = true;
+      }
+    });
+
+    return result;
+  };
+
+  let blocks = [];
+
+  const trimNode = (node) => {
+    let html = node.innerHTML
+      .trim()
+      .replace(/[ ]{2,}/g, "")
+      .replace(/[\n]{3,}/g, "\n\n");
+
+    node.innerHTML = html;
+    return node;
+  };
+
+  const keep = [
+    "H1", "H2", "H3", "H4", "H5", "H6"
+  ];
+
+  const kill = [
+    "area",
+    "base",
+    "col",
+    "command",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "keygen",
+    "link",
+    "menuitem",
+    "meta",
+    "param",
+    "object",
+    "source",
+    "svg",
+    "track",
+    "video",
+    "wbr",
+  ];
+
+  // kill the following nodes
+  Array.from(node.querySelectorAll(kill.join(","))).forEach(childNode => {
+    childNode.parentNode.removeChild(childNode);
+  });
+
+  const removeBlockElements = (node) => {
+
+    if (hasBlockElements(node) === false) {
+      trimNode(node);
+
+      if (node.innerHTML === "") {
+        return;
+      }
+
+      if (keep.includes(node.nodeName)) {
+        blocks.push(node.outerHTML);
+      } else {
+        blocks.push(node.innerHTML);
+      }
+      return;
+    }
+
+    Array.from(node.children).forEach(child => {
+      removeBlockElements(child);
+
+      if (isInline(child) === false) {
+        trimNode(child);
+
+        if (keep.includes(child.nodeName) === false) {
+          unwrapElement(child);
+        }
+      }
+    });
+  };
+
+  removeBlockElements(node);
+
+  return blocks.join("\n\n");
+};
+
 var Parser = (node, formats = {}) => {
 
   if (typeof node === "string") {
@@ -302,38 +436,38 @@ var Parser = (node, formats = {}) => {
   }
 
   const inline = [
-    "b",
-    "big",
-    "i",
-    "small",
-    "tt",
+    "a",
     "abbr",
     "acronym",
+    "b",
+    "bdo",
+    "big",
+    "br",
+    "button",
     "cite",
     "code",
     "del",
     "dfn",
     "em",
-    "kbd",
-    "strong",
-    "samp",
-    "var",
-    "a",
-    "bdo",
-    "br",
+    "i",
     "img",
+    "input",
+    "kbd",
+    "label",
     "map",
     "object",
     "q",
+    "samp",
     "script",
+    "select",
+    "small",
     "span",
+    "strong",
     "sub",
     "sup",
-    "button",
-    "input",
-    "label",
-    "select",
-    "textarea"
+    "textarea",
+    "tt",
+    "var",
   ];
 
   /**
@@ -370,21 +504,9 @@ var Parser = (node, formats = {}) => {
     Array.from(node.childNodes).forEach(child => {
       if (child.nodeName === "#text") {
         chars.push(...charsInTextNode(child, parentFormats));
-      } else if (child.nodeName === "BR") {
-        chars.push({
-          text: "\n",
-          format: {}
-        });
       } else {
         const childFormats = nodeFormats(child, parentFormats);
         chars.push(...charsInNode(child, childFormats));
-
-        if (inline.includes(child.nodeName.toLowerCase()) === false) {
-          chars.push({
-            text: " ",
-            format: {}
-          });
-        }
       }
     });
 
@@ -420,12 +542,24 @@ var Parser = (node, formats = {}) => {
   };
 
   /**
-  * for some reason we need to clone the array
-  * with the JSON trick here to avoid some weird
-  * reference issues later. I guess it has something
-  * to do with merging arrays
-  */
-  return Clone(charsInNode(node));
+   * Remove all block elements from the given node
+   */
+  const html = Inliner(node, inline);
+
+  /**
+   * Create a temporary node container
+   * for the next steps
+   */
+  let container = document.createElement("div");
+  container.innerHTML = html;
+
+  /**
+   * for some reason we need to clone the array
+   * with the JSON trick here to avoid some weird
+   * reference issues later. I guess it has something
+   * to do with merging arrays
+   */
+  return Clone(charsInNode(container));
 
 };
 
@@ -436,13 +570,23 @@ var Document = (element, params = {}) => {
     history: 100,
     onCommit: () => {},
     onRedo: () => {},
-    onUndo: () => {}
+    onUndo: () => {},
+    triggers: {}
   };
 
   const options = { ...defaults, ...params };
   const history = History$1(options.history);
+  const triggers = { ... defaults.triggers, ... params.triggers || {} };
+  const triggerKeys = Object.keys(triggers);
+  const triggerMaxLength = Math.max(...triggerKeys.map(key => key.length));
 
-  let doc = element ? Parser(element, options.formats) : [];
+  let doc;
+
+  if (Array.isArray(element) === true) {
+    doc = element;
+  } else {
+    doc = element ? Parser(element, options.formats) : [];
+  }
 
   const activeFormats = (start, length) => {
     start  = startAt(start);
@@ -616,6 +760,22 @@ var Document = (element, params = {}) => {
       text: text,
       format: format
     });
+
+    /**
+     * Trigger custom events based on inserted
+     * text. This can be used to trigger a command
+     * when "/ " is entered into the writer or
+     * trigger Markdown conversions based on Markdown syntax
+     */
+     if (triggerKeys.length && doc.length <= triggerMaxLength) {
+      const currentText = doc.map(char => char.text).join("");
+      triggerKeys.some(key => {
+        if (currentText === key) {
+          triggers[key]();
+          return true;
+        }
+      });
+    }
 
     commit(doc, "insertText", { text, start: position + 1 });
   };
@@ -1211,6 +1371,7 @@ var Writer = (element, params) => {
    * Default options and events
    */
   const defaults = {
+    autofocus: false,
     breaks: true,
     formats: {},
     history: 100,
@@ -1228,7 +1389,8 @@ var Writer = (element, params) => {
     onUndo: () => {},
     placeholder: "",
     shortcuts: {},
-    spellcheck: true
+    spellcheck: true,
+    triggers: {},
   };
 
   const options = { ...defaults, ...params };
@@ -1251,7 +1413,8 @@ var Writer = (element, params) => {
     onUndo: (doc, action, args) => {
       onHistory(doc, action, args);
       options.onUndo(doc, action, args);
-    }
+    },
+    triggers: options.triggers
   });
 
   const selection = Selection(element);
@@ -1277,9 +1440,24 @@ var Writer = (element, params) => {
       let start  = selection.start();
       let length = selection.length();
 
+      /**
+       * With single character selections
+       * the character before the cursor
+       * should be removed
+       */
       if (length === 0) {
         start  = start - 1;
         length = 1;
+
+        /**
+         * If the cursor is at the beginning
+         * of the element, no character should
+         * be removed. Otherwise it deletes
+         * from the end, which leads to weird effects
+         */
+        if (start < 0) {
+          return;
+        }
       }
 
       doc.removeText(start, length);
@@ -1385,6 +1563,14 @@ var Writer = (element, params) => {
   };
 
   /**
+   * Focus the Writer element
+   * at the given position (optional)
+   */
+  const focus = (position) => {
+    select(position);
+  };
+
+  /**
    * Apply the given format
    * and optional attributes
    */
@@ -1422,6 +1608,15 @@ var Writer = (element, params) => {
    * Select text in the editor
    */
   const select = (start, length) => {
+    switch (start) {
+      case "end":
+        start = doc.length();
+        break;
+      case "start":
+        start = 0;
+        break;
+    }
+
     isSelecting = true;
     selection.select(start, start + (length || 0));
   };
@@ -1504,6 +1699,10 @@ var Writer = (element, params) => {
     const clipboardData = event.clipboardData || window.clipboardData;
     const html = clipboardData.getData('text/html') || clipboardData.getData("text");
 
+    if (selection.length() > 0) {
+      command("delete");
+    }
+
     command("paste", html);
   });
 
@@ -1564,16 +1763,13 @@ var Writer = (element, params) => {
     }
 
     /**
-    * Delete selected text before
-    * new text is entered, but
-    * only if this is not a special key
-    */
-    const start = selection.start();
-    const end = selection.end();
-
+     * Delete selected text before
+     * new text is entered, but
+     * only if this is not a special key
+     */
     if (
       // if there's an existing selection
-      start !== end &&
+      selection.length() > 0 &&
       // the control key must not be pressed: could be a shortcut
       event.ctrlKey === false &&
       // the meta key must not be pressed: could be a shortcut
@@ -1622,6 +1818,13 @@ var Writer = (element, params) => {
   element.innerHTML = doc.toHtml();
 
   /**
+   * Auto-focus the element
+   */
+  if (options.autofocus) {
+    focus();
+  }
+
+  /**
    * Public commands and properties
    */
   return {
@@ -1631,6 +1834,7 @@ var Writer = (element, params) => {
     cursor,
     doc,
     element,
+    focus,
     options,
     redo,
     select,
