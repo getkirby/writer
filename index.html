@@ -139,6 +139,7 @@ const updatePreview = () => {
  * Writer instance
  */
 window.writer = Writer(".writer", {
+  autofocus: true,
   breaks: true,
   onChange() {
     updatePreview();

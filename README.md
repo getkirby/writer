@@ -25,7 +25,7 @@ This library also does not support any legacy browsers. We don't have to care ab
 
 ## It's pretty small
 
-14 kb compressed / 39 kb uncompressed – we are really proud of its small footprint. 
+14 kb compressed / 39 kb uncompressed – we are really proud of its small footprint.
 
 ## Demo
 
@@ -47,7 +47,7 @@ onChange() {
 </script>
 ```
 
-### Install via npm 
+### Install via npm
 
 ```
 npm i @getkirby/writer
@@ -97,6 +97,9 @@ const writer = Writer(".writer", {
 });
 </script>
 ```
+
+#### `autofocus: true`
+Enables/disables autofocus for the Writer element as soon as it is initialized
 
 #### `breaks: true`
 Enables/disables line breaks within the text. Line breaks are enabled by default.
@@ -150,16 +153,32 @@ Add a placeholder text to the Writer when there's no content.
 You can pass your own keyboard shortcuts or overwrite existing shortcuts with this object. Keyboard shortcuts are defined like this:
 
 ```js
-const shortcuts = {
-    "Meta+b": () => {
-        // make something bold
+const writer = Writer(".writer", {
+    shortcuts: {
+        "Meta+b": () => {
+            // make something bold
+        }
     }
-};
+});
 ```
 The following special keywords for key combinations are automatically injected when pressed (in the following order): `Meta`, `Alt`, `Ctrl`, `Shift`
 
 #### `spellcheck: true`
 Enable/disable native spellchecking
+
+#### `triggers: {}`
+
+Add custom key combinations, which will trigger a command, when being entered at the beginning of the text. This can be used to trigger a command when "/" is entered or to use typical Markdown syntax to trigger format changes (i.e. ## would convert the block to h2).
+
+```js
+const writer = Writer(".writer", {
+    triggers: {
+        "/": () => {
+            // open the command dropdown
+        }
+    }
+});
+```
 
 ### Methods
 
@@ -263,6 +282,12 @@ Moves the cursor to the given position
 
 
 -----
+
+#### `writer.focus(position)`
+
+Focusses the element and sets the cursor at the optional position.
+You can use index numbers for the position as well as the
+`start` and `end` keywords.
 
 #### `writer.redo()`
 

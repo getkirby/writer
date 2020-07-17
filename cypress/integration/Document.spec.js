@@ -601,6 +601,49 @@ describe("Document", () => {
 
   });
 
+  describe.only("Document.triggers", () => {
+    it("should fire custom trigger", () => {
+      let triggered = false;
+      const doc = Doc(null, {
+        triggers: {
+          "- ": () => {
+            triggered = true;
+          }
+        }
+      })
+
+      doc.insertText("- ");
+      expect(triggered).to.be.true;
+    });
+
+    it("should fire custom trigger in right order", () => {
+      let triggered = false;
+      const doc = Doc(null, {
+        triggers: {
+          "### ": () => {
+            triggered = "H3";
+          },
+          "## ": () => {
+            triggered = "H2";
+          },
+          "# ": () => {
+            triggered = "H1";
+          }
+        }
+      })
+
+      doc.insertText("# ");
+
+      expect(triggered).to.equal("H1");
+
+      doc.removeText(0, 2);
+      doc.insertText("### ");
+
+      expect(triggered).to.equal("H3");
+    });
+
+  });
+
   describe("Document.undo()", () => {
     it("should undo the last step", () => {
       const doc = Doc();

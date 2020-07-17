@@ -42,6 +42,14 @@ describe("Writer", () => {
     });
   });
 
+  it("should not delete on backspace when the cursor is at the beginning of the element", () => {
+    write("Hello{leftarrow}{leftarrow}{leftarrow}{leftarrow}{leftarrow}");
+    write("{backspace}");
+    writer((writer) => {
+      expect(writer.toText()).to.equal("Hello");
+    });
+  });
+
   it("should forward delete", () => {
     write("Hello");
     writer((writer) => {
@@ -166,6 +174,39 @@ describe("Writer", () => {
     write("{leftarrow}{shift}{del}");
     writer((writer) => {
       expect(writer.toText()).to.equal("Hell");
+    });
+  });
+
+  it("should focus at the start", () => {
+    write("Hello");
+
+    writer((writer) => {
+      writer.focus("start");
+
+      expect(writer.selection.start()).to.equal(0);
+      expect(writer.selection.end()).to.equal(0);
+    });
+  });
+
+  it("should focus at the end", () => {
+    write("Hello");
+
+    writer((writer) => {
+      writer.focus("end");
+
+      expect(writer.selection.start()).to.equal(5);
+      expect(writer.selection.end()).to.equal(5);
+    });
+  });
+
+  it("should focus at a specific position", () => {
+    write("Hello");
+
+    writer((writer) => {
+      writer.focus(2);
+
+      expect(writer.selection.start()).to.equal(2);
+      expect(writer.selection.end()).to.equal(2);
     });
   });
 
