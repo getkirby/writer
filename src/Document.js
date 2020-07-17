@@ -9,11 +9,15 @@ export default (element, params = {}) => {
     history: 100,
     onCommit: () => {},
     onRedo: () => {},
-    onUndo: () => {}
+    onUndo: () => {},
+    triggers: {}
   };
 
   const options = { ...defaults, ...params };
   const history = History(options.history);
+  const triggers = { ... defaults.triggers, ... params.triggers || {} };
+  const triggerKeys = Object.keys(triggers);
+  const triggerMaxLength = Math.max(...triggerKeys.map(key => key.length));
 
   let doc;
 
@@ -196,6 +200,22 @@ export default (element, params = {}) => {
       text: text,
       format: format
     });
+
+    /**
+     * Trigger custom events based on inserted
+     * text. This can be used to trigger a command
+     * when "/ " is entered into the writer or
+     * trigger Markdown conversions based on Markdown syntax
+     */
+     if (triggerKeys.length && doc.length <= triggerMaxLength) {
+      const currentText = doc.map(char => char.text).join("");
+      triggerKeys.some(key => {
+        if (currentText === key) {
+          triggers[key]();
+          return true;
+        }
+      });
+    }
 
     commit(doc, "insertText", { text, start: position + 1 });
   };
