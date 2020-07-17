@@ -43,6 +43,11 @@ describe("Formats", () => {
       });
     });
 
+    it("should detect a heading element", () => {
+      const element = el("h1", "Test");
+      expect(Formats.bold.parser(element)).to.be.true;
+    });
+
   });
 
   describe("Formats.code.html()", () => {

@@ -1,4 +1,5 @@
-import clone from "./Clone.js";
+import Clone from "./Clone.js";
+import Inliner from "./Inliner.js";
 
 export default (node, formats = {}) => {
 
@@ -7,38 +8,38 @@ export default (node, formats = {}) => {
   }
 
   const inline = [
-    "b",
-    "big",
-    "i",
-    "small",
-    "tt",
+    "a",
     "abbr",
     "acronym",
+    "b",
+    "bdo",
+    "big",
+    "br",
+    "button",
     "cite",
     "code",
     "del",
     "dfn",
     "em",
-    "kbd",
-    "strong",
-    "samp",
-    "var",
-    "a",
-    "bdo",
-    "br",
+    "i",
     "img",
+    "input",
+    "kbd",
+    "label",
     "map",
     "object",
     "q",
+    "samp",
     "script",
+    "select",
+    "small",
     "span",
+    "strong",
     "sub",
     "sup",
-    "button",
-    "input",
-    "label",
-    "select",
-    "textarea"
+    "textarea",
+    "tt",
+    "var",
   ];
 
   /**
@@ -75,21 +76,9 @@ export default (node, formats = {}) => {
     Array.from(node.childNodes).forEach(child => {
       if (child.nodeName === "#text") {
         chars.push(...charsInTextNode(child, parentFormats));
-      } else if (child.nodeName === "BR") {
-        chars.push({
-          text: "\n",
-          format: {}
-        });
       } else {
         const childFormats = nodeFormats(child, parentFormats);
         chars.push(...charsInNode(child, childFormats));
-
-        if (inline.includes(child.nodeName.toLowerCase()) === false) {
-          chars.push({
-            text: " ",
-            format: {}
-          });
-        }
       }
     });
 
@@ -125,11 +114,23 @@ export default (node, formats = {}) => {
   };
 
   /**
-  * for some reason we need to clone the array
-  * with the JSON trick here to avoid some weird
-  * reference issues later. I guess it has something
-  * to do with merging arrays
-  */
-  return clone(charsInNode(node));
+   * Remove all block elements from the given node
+   */
+  const html = Inliner(node, inline);
+
+  /**
+   * Create a temporary node container
+   * for the next steps
+   */
+  let container = document.createElement("div");
+  container.innerHTML = html;
+
+  /**
+   * for some reason we need to clone the array
+   * with the JSON trick here to avoid some weird
+   * reference issues later. I guess it has something
+   * to do with merging arrays
+   */
+  return Clone(charsInNode(container));
 
 };

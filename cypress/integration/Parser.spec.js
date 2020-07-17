@@ -1,5 +1,6 @@
 import Formats from "../../src/Formats.js";
 import Parser from "../../src/Parser.js";
+import Doc from "../../src/Document.js";
 
 const Container = (html) => {
   let element = document.createElement("div");
@@ -75,6 +76,75 @@ describe("Parser", () => {
     expect(result).to.deep.equal(expected);
   });
 
+  it("should parse multi-line HTML", () => {
+    const container = Container(`
+      <div>
+        <div>
+          <p>
+            <strong>Hello</strong> <i><del>world</del></i></strong>
+          </p>
+          <p>This is nice</p>
+        </div>
+      </div>
+    `);
+    const result = Parser(container, Formats);
+    const formatted = Doc(result, { formats: Formats });
+    const plain = Doc(result);
+
+    expect(formatted.toHtml()).to.equal("<strong>Hello</strong> <del><em>world</em></del>\n\nThis is nice");
+    expect(plain.toHtml()).to.equal("Hello world\n\nThis is nice");
+  });
+
+  it("should parse multi-line HTML with correct line breaks", () => {
+
+    const container = Container(`
+      <p>Paragraph 1</p><p>Paragraph 2</p>
+    `);
+
+    const result = Parser(container, Formats);
+    const plain  = Doc(result);
+
+    expect(plain.toHtml()).to.equal("Paragraph 1\n\nParagraph 2");
+  });
+
+  it.only("should keep multiple headings", () => {
+    const container = Container(`
+        <h1>H1</h1>
+        <p>Text</p>
+        <h2>H2</h2>
+        <p>Text</p>
+      `);
+
+    const result = Parser(container, Formats);
+    const doc = Doc(result, { formats: Formats });
+
+    expect(doc.toHtml()).to.equal(
+      `<strong>H1</strong>\n\n` +
+      `Text\n\n` +
+      `<strong>H2</strong>\n\n` +
+      `Text`
+    );
+  });
+
+  it.only("should keep nested headings", () => {
+    const container = Container(`
+        <h1>H1</h1>
+        <section>
+          <h2>H2</h2>
+          <p>Text</p>
+        </section>
+      `);
+
+    const result = Parser(container, Formats);
+    const doc = Doc(result, { formats: Formats });
+
+    expect(doc.toHtml()).to.equal(
+      `<strong>H1</strong>\n\n` +
+      `<strong>H2</strong>\n\n` +
+      `Text`
+    );
+  });
+
   describe("bold", () => {
 
     it("should parse <strong> elements", () => {
@@ -97,6 +167,15 @@ describe("Parser", () => {
 
     it("should parse fontWeight", () => {
       const container = Container(`<span style="font-weight: bold">A</span>`);
+      const result = Parser(container, Formats);
+      const expected = [
+        { text: "A", format: { bold: true } },
+      ];
+      expect(result).to.deep.equal(expected);
+    });
+
+    it("should parse <h1> elements", () => {
+      const container = Container("<h1>A</h1>");
       const result = Parser(container, Formats);
       const expected = [
         { text: "A", format: { bold: true } },
