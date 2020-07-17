@@ -307,6 +307,10 @@ export default (element, params) => {
     const clipboardData = event.clipboardData || window.clipboardData;
     const html = clipboardData.getData('text/html') || clipboardData.getData("text");
 
+    if (selection.length() > 0) {
+      command("delete");
+    }
+
     command("paste", html);
   });
 
@@ -367,16 +371,13 @@ export default (element, params) => {
     }
 
     /**
-    * Delete selected text before
-    * new text is entered, but
-    * only if this is not a special key
-    */
-    const start = selection.start();
-    const end = selection.end();
-
+     * Delete selected text before
+     * new text is entered, but
+     * only if this is not a special key
+     */
     if (
       // if there's an existing selection
-      start !== end &&
+      selection.length() > 0 &&
       // the control key must not be pressed: could be a shortcut
       event.ctrlKey === false &&
       // the meta key must not be pressed: could be a shortcut
