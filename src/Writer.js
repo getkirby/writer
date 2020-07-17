@@ -14,6 +14,7 @@ export default (element, params) => {
    * Default options and events
    */
   const defaults = {
+    autofocus: false,
     breaks: true,
     formats: {},
     history: 100,
@@ -31,7 +32,8 @@ export default (element, params) => {
     onUndo: () => {},
     placeholder: "",
     shortcuts: {},
-    spellcheck: true
+    spellcheck: true,
+    triggers: {},
   };
 
   const options = { ...defaults, ...params };
@@ -54,7 +56,8 @@ export default (element, params) => {
     onUndo: (doc, action, args) => {
       onHistory(doc, action, args);
       options.onUndo(doc, action, args);
-    }
+    },
+    triggers: options.triggers
   });
 
   const selection = Selection(element);
@@ -80,9 +83,24 @@ export default (element, params) => {
       let start  = selection.start();
       let length = selection.length();
 
+      /**
+       * With single character selections
+       * the character before the cursor
+       * should be removed
+       */
       if (length === 0) {
         start  = start - 1;
         length = 1;
+
+        /**
+         * If the cursor is at the beginning
+         * of the element, no character should
+         * be removed. Otherwise it deletes
+         * from the end, which leads to weird effects
+         */
+        if (start < 0) {
+          return;
+        }
       }
 
       doc.removeText(start, length);
@@ -188,6 +206,14 @@ export default (element, params) => {
   };
 
   /**
+   * Focus the Writer element
+   * at the given position (optional)
+   */
+  const focus = (position) => {
+    select(position);
+  };
+
+  /**
    * Apply the given format
    * and optional attributes
    */
@@ -225,6 +251,15 @@ export default (element, params) => {
    * Select text in the editor
    */
   const select = (start, length) => {
+    switch (start) {
+      case "end":
+        start = doc.length();
+        break;
+      case "start":
+        start = 0;
+        break;
+    }
+
     isSelecting = true;
     selection.select(start, start + (length || 0));
   };
@@ -426,6 +461,13 @@ export default (element, params) => {
   element.innerHTML = doc.toHtml();
 
   /**
+   * Auto-focus the element
+   */
+  if (options.autofocus) {
+    focus();
+  }
+
+  /**
    * Public commands and properties
    */
   return {
@@ -435,6 +477,7 @@ export default (element, params) => {
     cursor,
     doc,
     element,
+    focus,
     options,
     redo,
     select,
