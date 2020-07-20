@@ -1,180 +1,215 @@
-<link rel="stylesheet" href="./writer.css">
-<style>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./writer.css">
+  <title>Kirby Writer</title>
 
-  * {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    padding: 0;
-    margin: 0;
-  }
+  <style>
+    * {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      padding: 0;
+      margin: 0;
+    }
 
-  .writer {
-    height: 100%;
-    border: 0;
-    padding: 3rem;
-  }
+    :root {
+      --padding: 2.5rem;
+    }
 
-  .writer:focus {
-    outline: none;
-  }
+    .writer {
+      height: 100%;
+      border: 0;
+      padding: var(--padding);
+    }
 
-  .layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    height: 100%;
-  }
+    .writer:focus {
+      outline: none;
+    }
 
-  .preview {
-    padding: .5rem;
-    white-space: pre-wrap;
-    background: #000;
-    min-height: 100%;
-    color: #fff;
-    font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
-  }
+    .layout {
+      display: grid;
+    }
 
-  .github {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
+    .preview {
+      padding: .5rem;
+      white-space: pre-wrap;
+      background: #000;
+      color: #fff;
+      font-family: "SFMono-Regular", Consolas, Liberation Mono, Menlo, Courier, monospace;
+      margin: 0 var(--padding) var(--padding) var(--padding);
+      border-radius: 3px;
+    }
 
-  .toolbar {
-    position: absolute;
-    display: none;
-    border-radius: 3px;
-    background: #000;
-    color: #fff;
-    box-shadow: rgba(0,0,0, .25) 0 5px 10px;
-  }
+    .github {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: none;
+    }
 
-  .toolbar hr {
-    border: 0;
-    width: 1px;
-    background: rgba(255,255,255, .25);
-  }
+    .toolbar {
+      position: absolute;
+      display: none;
+      border-radius: 3px;
+      background: #000;
+      color: #fff;
+      box-shadow: rgba(0, 0, 0, .25) 0 5px 10px;
+    }
 
-  .toolbar button {
-    border: 0;
-    background: none;
-    padding: .5rem;
-    color: currentColor;
-    cursor: pointer;
-  }
+    .toolbar hr {
+      border: 0;
+      width: 1px;
+      background: rgba(255, 255, 255, .25);
+    }
 
-  .toolbar button.active {
-    color: #7e9abf;
-  }
+    .toolbar button {
+      border: 0;
+      background: none;
+      padding: .5rem;
+      color: currentColor;
+      cursor: pointer;
+    }
 
-</style>
+    .toolbar button.active {
+      color: #7e9abf;
+    }
 
-<main class="layout">
+    @media screen and (min-width: 60rem) {
+      :root {
+        --padding: 3rem;
+      }
 
-  <div>
-    <div class="toolbar">
-      <button type="button" data-command="bold">B</button>
-      <button type="button" data-command="italic"><i>i</i></button>
-      <button type="button" data-command="strikeThrough"><del>S</del></button>
-      <hr>
-      <button type="button" data-command="code">Code</button>
-      <hr>
-      <button type="button" data-command="link"><u>Link</u></button>
+      .layout {
+        grid-template-columns: 1fr 1fr;
+        height: 100%;
+      }
+
+      .github {
+        display: block;
+      }
+
+      .preview {
+        min-height: 100%;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+
+</head>
+<body>
+
+  <main class="layout">
+
+    <div>
+      <div class="toolbar">
+        <button type="button" data-command="bold">B</button>
+        <button type="button" data-command="italic"><i>i</i></button>
+        <button type="button" data-command="strikeThrough"><del>S</del></button>
+        <hr>
+        <button type="button" data-command="code">Code</button>
+        <hr>
+        <button type="button" data-command="link"><u>Link</u></button>
+      </div>
+
+      <div class="writer"></div>
+
     </div>
 
-    <div class="writer"></div>
+    <code><pre class="preview"></pre></code>
 
-  </div>
+  </main>
 
-  <code><pre class="preview"></pre></code>
+  <a class="github" href="https://github.com/getkirby/writer">
+    <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
+  </a>
 
-</main>
+  <script type="module">
+  import Toolbar from "./src/Toolbar.js";
+  import Writer from "./src/Writer.js";
 
-<a class="github" href="https://github.com/getkirby/writer">
-  <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
-</a>
+  const preview = document.querySelector(".preview");
 
-<script type="module">
-import Toolbar from "./src/Toolbar.js";
-import Writer from "./src/Writer.js";
+  /**
+   * Creates a new link
+   */
+  const createLink = () => {
+    let href = null;
+    let link = writer.activeLink();
 
-const preview = document.querySelector(".preview");
+    if (link) {
+      href = link.href;
+    }
 
-/**
- * Creates a new link
- */
-const createLink = () => {
-  let href = null;
-  let link = writer.activeLink();
+    const url = prompt("Please enter a URL", href || "");
 
-  if (link) {
-    href = link.href;
-  }
+    if (url) {
+      writer.command("link", url);
+    } else if (url !== null) {
+      writer.command("unlink");
+    }
 
-  const url = prompt("Please enter a URL", href || "");
-
-  if (url) {
-    writer.command("link", url);
-  } else if (url !== null) {
-    writer.command("unlink");
-  }
-
-  toolbar.hide();
-
-};
-
-/**
- * Toolbar
- */
-const toolbar = Toolbar(".toolbar", (command) => {
-  if (command === "link") {
-    createLink();
-  } else {
-    writer.command(command);
-  }
-});
-
-const updatePreview = () => {
-  preview.innerHTML = JSON.stringify(writer.toJson(), null, 4);
-};
-
-/**
- * Writer instance
- */
-window.writer = Writer(".writer", {
-  autofocus: true,
-  breaks: true,
-  onChange() {
-    updatePreview();
-  },
-  onMousedown() {
     toolbar.hide();
-  },
-  onSelection() {
-    toolbar.activeFormats(writer.activeFormats());
-  },
-  onSelectionEnd() {
-    const rect = writer.selection.rect();
 
-    if (writer.selection.length() > 0) {
-      toolbar.show(rect);
-    } else {
-      toolbar.hide();
-    }
-  },
-  placeholder: "Start writing …",
-  shortcuts: {
-    "Meta+k": () => {
+  };
+
+  /**
+   * Toolbar
+   */
+  const toolbar = Toolbar(".toolbar", (command) => {
+    if (command === "link") {
       createLink();
+    } else {
+      writer.command(command);
     }
-  },
-});
+  });
 
-/**
- * Update the preview with the right
- * document state after the writer gets
- * initialized. This is only necessary
- * for this demo or if you want to trigger
- * the onChange event immediately.
- */
-updatePreview();
+  const updatePreview = () => {
+    preview.innerHTML = JSON.stringify(writer.toJson(), null, 4);
+  };
 
-</script>
+  /**
+   * Writer instance
+   */
+  window.writer = Writer(".writer", {
+    autofocus: true,
+    breaks: true,
+    onChange() {
+      updatePreview();
+    },
+    onMousedown() {
+      toolbar.hide();
+    },
+    onSelection() {
+      toolbar.activeFormats(writer.activeFormats());
+    },
+    onSelectionEnd() {
+      const rect = writer.selection.rect();
+
+      if (writer.selection.length() > 0) {
+        toolbar.show(rect);
+      } else {
+        toolbar.hide();
+      }
+    },
+    placeholder: "Start writing …",
+    shortcuts: {
+      "Meta+k": () => {
+        createLink();
+      }
+    },
+  });
+
+  /**
+   * Update the preview with the right
+   * document state after the writer gets
+   * initialized. This is only necessary
+   * for this demo or if you want to trigger
+   * the onChange event immediately.
+   */
+  updatePreview();
+
+  </script>
+
+</body>
+</html>
