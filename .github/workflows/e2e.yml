@@ -1,0 +1,27 @@
+name: E2E
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: E2E
+    steps:
+      # We need to increase the amount of inotify watchers in order to prevent errors
+      # https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers#the-technical-details
+      - name: Setup
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          headless: true
+          start: npm start
+          wait-on: 'http://localhost:8181'
