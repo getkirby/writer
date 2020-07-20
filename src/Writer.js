@@ -226,6 +226,14 @@ export default (element, params) => {
     select(start, length);
   };
 
+  const getEventHtml = (event) => {
+    return event.dataTransfer.getData("text/html") || event.dataTransfer.getData("text");
+  }
+
+  const getEventText = (event) => {
+    return event.dataTransfer.getData("text");
+  }
+
   const onSelectionEnd = () => {
     if (isSelecting === true) {
       isSelecting = false;
@@ -436,13 +444,35 @@ export default (element, params) => {
     }
   });
 
+  element.addEventListener("beforeinput", (event) => {
+    switch (event.inputType) {
+      case "insertReplacementText":
+        event.preventDefault();
+        const html = getEventText(event);
+        command("delete");
+        command("paste", html);
+        break;
+    };
+  });
+
+  element.addEventListener("cut", (event) => {
+    event.preventDefault();
+    command("delete");
+  });
+
   element.addEventListener("drop", (event) => {
     event.preventDefault();
-    const html = event.dataTransfer.getData("text/html") || event.dataTransfer.getData("text");
-
-    console.log(html);
-
+    const html = getEventHtml(event);
     command("paste", html);
+  });
+
+  element.addEventListener("beforeinput", (event) => {
+    switch (event.inputType) {
+      case "deleteContentBackward":
+        event.preventDefault();
+        command("delete");
+        break;
+    }
   });
 
   /**
@@ -452,7 +482,16 @@ export default (element, params) => {
    */
   element.addEventListener("input", (event) => {
 
-    console.log(event.inputType);
+    /**
+     * Map format* events to the available
+     * formatting commands
+     */
+    if (event.inputType.match(/^format/)) {
+      let cmd = event.inputType.replace("format", "");
+      cmd = cmd[0].toLowerCase() + cmd.slice(1);
+      command(cmd);
+      return;
+    }
 
     switch (event.inputType) {
       case "historyRedo":
