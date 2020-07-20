@@ -436,12 +436,24 @@ export default (element, params) => {
     }
   });
 
+  element.addEventListener("drop", (event) => {
+    event.preventDefault();
+    const html = event.dataTransfer.getData("text/html") || event.dataTransfer.getData("text");
+
+    console.log(html);
+
+    command("paste", html);
+  });
+
   /**
    * It's easier to recognize text input
    * in the input event instead of the keydown
    * event.
    */
   element.addEventListener("input", (event) => {
+
+    console.log(event.inputType);
+
     switch (event.inputType) {
       case "historyRedo":
         redo();

@@ -12,6 +12,7 @@ export default (node, formats = {}) => {
     "abbr",
     "acronym",
     "b",
+    "bdi",
     "bdo",
     "big",
     "br",
