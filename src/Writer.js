@@ -449,6 +449,8 @@ export default (element, params) => {
       case "historyUndo":
         undo();
         break;
+      case "insertCompositionText":
+      case "insertFromComposition":
       case "insertText":
         command("insert", event.data, cursor.position() - 1);
         break;
